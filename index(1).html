@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Formulário de registro de ações de Educação Permanente em Saúde">
+  <title>Educação Permanente em Saúde</title>
+
+  <style>
+    :root {
+      --primary: #5527a5;
+      --primary-dark: #3c187f;
+      --primary-light: #f1eafd;
+      --accent: #7244c7;
+      --background: #f7f5fb;
+      --surface: #ffffff;
+      --text: #24212b;
+      --muted: #6f6a78;
+      --border: #ded9e7;
+      --danger: #c93434;
+      --success: #257a4c;
+      --shadow: 0 16px 40px rgba(50, 29, 87, .10);
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(114, 68, 199, .13), transparent 30rem),
+        var(--background);
+    }
+
+    button, input, select, textarea {
+      font: inherit;
+    }
+
+    .page {
+      width: min(1120px, calc(100% - 32px));
+      margin: 28px auto 56px;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      min-height: 155px;
+      padding: 30px 38px;
+      color: #fff;
+      background: linear-gradient(125deg, var(--primary-dark), var(--primary), #6631b8);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -70px;
+      top: -100px;
+      width: 280px;
+      height: 280px;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 50%;
+    }
+
+    .brand {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      gap: 22px;
+    }
+
+    .brand-icon {
+      display: grid;
+      place-items: center;
+      width: 72px;
+      height: 72px;
+      font-size: 38px;
+      background: rgba(255,255,255,.14);
+      border: 1px solid rgba(255,255,255,.22);
+      border-radius: 20px;
+      backdrop-filter: blur(6px);
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(1.55rem, 3vw, 2.25rem);
+      letter-spacing: -.03em;
+    }
+
+    .hero p {
+      margin: 8px 0 0;
+      font-size: 1.02rem;
+      color: rgba(255,255,255,.86);
+    }
+
+    .institution {
+      position: relative;
+      z-index: 1;
+      max-width: 250px;
+      text-align: right;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+
+    .institution small {
+      display: block;
+      margin-top: 6px;
+      font-weight: 500;
+      color: rgba(255,255,255,.78);
+    }
+
+    .intro {
+      margin-top: 18px;
+      padding: 26px 30px;
+      background: var(--surface);
+      border-top: 6px solid var(--primary);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .intro h2 {
+      margin: 0 0 8px;
+      font-size: clamp(1.35rem, 2.5vw, 1.85rem);
+    }
+
+    .intro p {
+      max-width: 840px;
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .required-note {
+      margin-top: 14px;
+      color: var(--danger);
+      font-size: .9rem;
+    }
+
+    form {
+      margin-top: 18px;
+    }
+
+    .section {
+      margin-bottom: 18px;
+      overflow: hidden;
+      background: var(--surface);
+      border: 1px solid rgba(82, 49, 130, .10);
+      border-radius: var(--radius);
+      box-shadow: 0 10px 30px rgba(50, 29, 87, .06);
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 17px 24px;
+      background: linear-gradient(90deg, var(--primary-light), #fbf9ff);
+      color: var(--primary-dark);
+      font-weight: 800;
+      letter-spacing: .01em;
+    }
+
+    .section-number {
+      display: grid;
+      place-items: center;
+      min-width: 31px;
+      height: 31px;
+      color: white;
+      background: var(--primary);
+      border-radius: 50%;
+    }
+
+    .section-body {
+      padding: 24px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .col-4 { grid-column: span 4; }
+    .col-6 { grid-column: span 6; }
+    .col-8 { grid-column: span 8; }
+    .col-12 { grid-column: span 12; }
+
+    .field {
+      min-width: 0;
+    }
+
+    label, legend {
+      display: block;
+      margin-bottom: 8px;
+      font-size: .94rem;
+      font-weight: 700;
+    }
+
+    .required {
+      color: var(--danger);
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 13px 14px;
+      color: var(--text);
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      outline: none;
+      transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(114, 68, 199, .13);
+    }
+
+    input[readonly] {
+      color: #5c5665;
+      background: #f5f3f8;
+    }
+
+    textarea {
+      min-height: 112px;
+      resize: vertical;
+    }
+
+    .helper {
+      display: block;
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: .82rem;
+      line-height: 1.45;
+    }
+
+    fieldset {
+      min-width: 0;
+      margin: 0;
+      padding: 0;
+      border: 0;
+    }
+
+    .radio-group {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .radio-card {
+      position: relative;
+    }
+
+    .radio-card input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .radio-card label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 48px;
+      margin: 0;
+      padding: 10px 12px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      transition: .18s ease;
+    }
+
+    .radio-card label::before {
+      content: "";
+      width: 16px;
+      height: 16px;
+      border: 2px solid #aaa4b3;
+      border-radius: 50%;
+      box-shadow: inset 0 0 0 4px white;
+    }
+
+    .radio-card input:checked + label {
+      color: var(--primary-dark);
+      background: var(--primary-light);
+      border-color: var(--accent);
+    }
+
+    .radio-card input:checked + label::before {
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .metric-card {
+      height: 100%;
+      padding: 18px;
+      background: linear-gradient(145deg, #faf8ff, #f0e9fc);
+      border: 1px solid #e2d7f4;
+      border-radius: 12px;
+    }
+
+    .metric-card span {
+      display: block;
+      color: var(--muted);
+      font-size: .86rem;
+      font-weight: 700;
+    }
+
+    .metric-card strong {
+      display: block;
+      margin-top: 8px;
+      color: var(--primary-dark);
+      font-size: 1.7rem;
+    }
+
+    .upload-box {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 116px;
+      padding: 18px;
+      text-align: center;
+      cursor: pointer;
+      background: #fcfbfe;
+      border: 1.5px dashed #b9a6d8;
+      border-radius: 12px;
+      transition: .18s ease;
+    }
+
+    .upload-box:hover {
+      background: var(--primary-light);
+      border-color: var(--primary);
+    }
+
+    .upload-box input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+    }
+
+    .upload-box b {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--primary);
+    }
+
+    .file-name {
+      display: block;
+      margin-top: 8px;
+      color: var(--success);
+      font-size: .82rem;
+      font-weight: 700;
+    }
+
+    .consent {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 15px;
+      background: #faf9fc;
+      border-radius: 10px;
+    }
+
+    .consent input {
+      width: 18px;
+      height: 18px;
+      margin-top: 2px;
+      accent-color: var(--primary);
+    }
+
+    .consent label {
+      margin: 0;
+      font-weight: 500;
+      line-height: 1.5;
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 4px 4px 0;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 12px;
+    }
+
+    button {
+      min-height: 48px;
+      padding: 0 24px;
+      font-weight: 800;
+      cursor: pointer;
+      border: 0;
+      border-radius: 10px;
+      transition: transform .15s ease, box-shadow .15s ease, opacity .15s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    .primary-button {
+      color: white;
+      background: linear-gradient(110deg, var(--primary-dark), var(--primary));
+      box-shadow: 0 10px 22px rgba(85, 39, 165, .22);
+    }
+
+    .secondary-button {
+      color: var(--primary);
+      background: transparent;
+      border: 1px solid #cdbde7;
+    }
+
+    .privacy {
+      color: var(--muted);
+      font-size: .83rem;
+      text-align: right;
+    }
+
+    .status {
+      display: none;
+      margin-top: 16px;
+      padding: 14px 16px;
+      border-radius: 10px;
+      font-weight: 700;
+    }
+
+    .status.success {
+      display: block;
+      color: #185d39;
+      background: #e7f7ee;
+      border: 1px solid #a9dfc0;
+    }
+
+    .status.error {
+      display: block;
+      color: #8f2828;
+      background: #fdecec;
+      border: 1px solid #f2b4b4;
+    }
+
+    footer {
+      margin-top: 26px;
+      color: var(--muted);
+      font-size: .82rem;
+      text-align: center;
+    }
+
+    @media (max-width: 820px) {
+      .institution {
+        display: none;
+      }
+
+      .col-4, .col-6, .col-8 {
+        grid-column: span 12;
+      }
+
+      .radio-group {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .actions {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .privacy {
+        text-align: left;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .page {
+        width: min(100% - 20px, 1120px);
+        margin-top: 10px;
+      }
+
+      .hero {
+        min-height: auto;
+        padding: 24px 20px;
+        border-radius: 15px;
+      }
+
+      .brand {
+        align-items: flex-start;
+      }
+
+      .brand-icon {
+        width: 54px;
+        height: 54px;
+        font-size: 28px;
+        border-radius: 14px;
+      }
+
+      .intro, .section-body {
+        padding: 20px 17px;
+      }
+
+      .section-heading {
+        padding: 15px 17px;
+      }
+
+      .radio-group {
+        grid-template-columns: 1fr;
+      }
+
+      .button-group {
+        flex-direction: column;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+    <header class="hero">
+      <div class="brand">
+        <div class="brand-icon" aria-hidden="true">✦</div>
+        <div>
+          <h1>Educação Permanente em Saúde</h1>
+          <p>Registro de ações realizadas nas unidades</p>
+        </div>
+      </div>
+
+      <div class="institution">
+        Secretaria de Saúde
+        <small>Monitoramento da Educação Permanente</small>
+      </div>
+    </header>
+
+    <section class="intro">
+      <h2>Registro de Ações de Educação Permanente</h2>
+      <p>
+        Preencha os dados mensais da unidade. As informações serão utilizadas para o acompanhamento dos profissionais ativos, profissionais treinados e do índice de participação.
+      </p>
+      <div class="required-note">* Campo obrigatório</div>
+    </section>
+
+<form id="educationForm" novalidate>
+      <section class="section">
+        <div class="section-heading">
+          <span class="section-number">1</span>
+          IDENTIFICAÇÃO
+        </div>
+
+        <div class="section-body">
+          <div class="grid">
+            <div class="field col-6">
+              <label for="unidade">Unidade de Saúde <span class="required">*</span></label>
+              <select id="unidade" name="unidade" required>
+                <option value="">Selecione a unidade</option>
+                <option value="Hosp Ped Helena Moura">Hosp Ped Helena Moura</option>
+                <option value="Hosp Ped Maria Cravo">Hosp Ped Maria Cravo</option>
+                <option value="Poli Mat Barros Lima">Poli Mat Barros Lima</option>
+                <option value="Poli Mat Arnaldo Marques">Poli Mat Arnaldo Marques</option>
+                <option value="Mat Bandeira Filho">Mat Bandeira Filho</option>
+                <option value="Poli Amaury Coutinho">Poli Amaury Coutinho</option>
+                <option value="Poli Agamenon Magalhães">Poli Agamenon Magalhães</option>
+                <option value="Poli Gouveia de Barros">Poli Gouveia de Barros</option>
+                <option value="Policlínica Centro">Policlínica Centro</option>
+                <option value="Poli Valdemar Oliveira">Poli Valdemar Oliveira</option>
+                <option value="Poli Albert Sabin">Poli Albert Sabin</option>
+                <option value="Poli Salomão Kelner">Poli Salomão Kelner</option>
+                <option value="Poli Lessa de Andrade">Poli Lessa de Andrade</option>
+                <option value="Policlínica do Pina">Policlínica do Pina</option>
+                <option value="Poli Clementino Fraga">Poli Clementino Fraga</option>
+                <option value="Centro Méd José Ermírio">Centro Méd José Ermírio</option>
+                <option value="Central de Alergologia">Central de Alergologia</option>
+              </select>
+            </div>
+
+            <div class="field col-6">
+              <label for="mesReferencia">Mês de referência <span class="required">*</span></label>
+              <select id="mesReferencia" name="mesReferencia" required>
+                <option value="">Selecione o mês</option>
+                <option value="Janeiro">Janeiro</option>
+                <option value="Fevereiro">Fevereiro</option>
+                <option value="Março">Março</option>
+                <option value="Abril">Abril</option>
+                <option value="Maio">Maio</option>
+                <option value="Junho">Junho</option>
+                <option value="Julho">Julho</option>
+                <option value="Agosto">Agosto</option>
+                <option value="Setembro">Setembro</option>
+                <option value="Outubro">Outubro</option>
+                <option value="Novembro">Novembro</option>
+                <option value="Dezembro">Dezembro</option>
+              </select>
+            </div>
+
+            <div class="field col-6">
+              <label for="responsavel">Responsável pelo registro <span class="required">*</span></label>
+              <input
+                id="responsavel"
+                name="responsavel"
+                type="text"
+                required
+                placeholder="Digite o nome completo"
+              >
+            </div>
+
+            <div class="field col-6">
+              <label for="email">E-mail institucional <span class="required">*</span></label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                required
+                placeholder="nome@recife.pe.gov.br"
+              >
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-heading">
+          <span class="section-number">2</span>
+          DADOS DA AÇÃO
+        </div>
+
+        <div class="section-body">
+          <div class="grid">
+            <div class="field col-4">
+              <label for="profissionaisAtivos">
+                Profissionais ativos <span class="required">*</span>
+              </label>
+              <input
+                id="profissionaisAtivos"
+                name="profissionaisAtivos"
+                type="number"
+                min="1"
+                step="1"
+                required
+                placeholder="0"
+              >
+            </div>
+
+            <div class="field col-4">
+              <label for="profissionaisTreinados">
+                Profissionais treinados <span class="required">*</span>
+              </label>
+              <input
+                id="profissionaisTreinados"
+                name="profissionaisTreinados"
+                type="number"
+                min="0"
+                step="1"
+                required
+                placeholder="0"
+              >
+            </div>
+
+            <div class="field col-4">
+              <div class="metric-card" aria-live="polite">
+                <span>Índice de participação</span>
+                <strong id="indiceParticipacao">0,0%</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="actions">
+        <div class="button-group">
+          <button class="primary-button" type="submit">Enviar registro</button>
+          <button class="secondary-button" type="reset">Limpar formulário</button>
+        </div>
+        <div class="privacy">Os dados permanecem no navegador até o envio.</div>
+      </div>
+
+      <div id="statusMessage" class="status" role="status" aria-live="polite"></div>
+    </form>
+
+    <footer>
+      Protótipo funcional — Educação Permanente em Saúde
+    </footer>
+  </main>
+
+<script>
+    /*
+      INTEGRAÇÃO COM GOOGLE SHEETS
+      1. Publique um Google Apps Script como aplicativo da Web.
+      2. Cole a URL abaixo, entre aspas.
+      3. Enquanto a URL estiver vazia, o formulário funcionará em modo demonstração.
+    */
+    const GOOGLE_APPS_SCRIPT_URL = "";
+
+    const form = document.getElementById("educationForm");
+    const activeField = document.getElementById("profissionaisAtivos");
+    const trainedField = document.getElementById("profissionaisTreinados");
+    const indexElement = document.getElementById("indiceParticipacao");
+    const statusMessage = document.getElementById("statusMessage");
+
+    function updateIndex() {
+      const active = Number(activeField.value);
+      const trained = Number(trainedField.value);
+      const index = active > 0 ? (trained / active) * 100 : 0;
+
+      indexElement.textContent = index.toLocaleString("pt-BR", {
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1
+      }) + "%";
+    }
+
+    function validateTrainedQuantity() {
+      const active = Number(activeField.value);
+      const trained = Number(trainedField.value);
+
+      trainedField.setCustomValidity(
+        active > 0 && trained > active
+          ? "A quantidade de profissionais treinados não pode ser maior que a quantidade de profissionais ativos."
+          : ""
+      );
+    }
+
+    function collectData() {
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData.entries());
+
+      data.dataRegistro = new Date().toISOString();
+      data.indiceParticipacao = Number(activeField.value) > 0
+        ? Number(trainedField.value || 0) / Number(activeField.value)
+        : 0;
+
+      return data;
+    }
+
+    async function sendData(data) {
+      if (!GOOGLE_APPS_SCRIPT_URL) {
+        console.table(data);
+        return {
+          ok: true,
+          message: "Registro validado em modo de demonstração. Para gravar na planilha, configure a URL do Google Apps Script."
+        };
+      }
+
+      await fetch(GOOGLE_APPS_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+          "Content-Type": "text/plain;charset=utf-8"
+        },
+        body: JSON.stringify(data)
+      });
+
+      return {
+        ok: true,
+        message: "Registro enviado com sucesso."
+      };
+    }
+
+    activeField.addEventListener("input", () => {
+      updateIndex();
+      validateTrainedQuantity();
+    });
+
+    trainedField.addEventListener("input", () => {
+      updateIndex();
+      validateTrainedQuantity();
+    });
+
+    form.addEventListener("submit", async event => {
+      event.preventDefault();
+      statusMessage.className = "status";
+      statusMessage.textContent = "";
+
+      validateTrainedQuantity();
+
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        statusMessage.className = "status error";
+        statusMessage.textContent = "Revise os campos obrigatórios antes de enviar.";
+        return;
+      }
+
+      const submitButton = form.querySelector('button[type="submit"]');
+      submitButton.disabled = true;
+      submitButton.textContent = "Enviando...";
+
+      try {
+        const result = await sendData(collectData());
+        statusMessage.className = result.ok ? "status success" : "status error";
+        statusMessage.textContent = result.message;
+
+        if (GOOGLE_APPS_SCRIPT_URL && result.ok) {
+          form.reset();
+          indexElement.textContent = "0,0%";
+        }
+      } catch (error) {
+        console.error(error);
+        statusMessage.className = "status error";
+        statusMessage.textContent =
+          "Não foi possível enviar o registro. Verifique a conexão e a configuração do Google Apps Script.";
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = "Enviar registro";
+      }
+    });
+
+    form.addEventListener("reset", () => {
+      setTimeout(() => {
+        indexElement.textContent = "0,0%";
+        statusMessage.className = "status";
+        statusMessage.textContent = "";
+        trainedField.setCustomValidity("");
+      }, 0);
+    });
+  </script>
+</body>
+</html>
