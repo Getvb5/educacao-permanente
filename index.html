@@ -550,7 +550,7 @@
     <section class="intro">
       <h2>Registro de Ações de Educação Permanente</h2>
       <p>
-        Preencha os dados da atividade realizada. As informações poderão ser
+        Preencha os dados referentes ao período de monitoramento. As informações poderão ser
         utilizadas para o acompanhamento das unidades e para o cálculo dos
         indicadores de participação.
       </p>
@@ -589,25 +589,36 @@
               <option value="Central de Alergologia">Central de Alergologia</option>
               </select>
             </div>
-
-            <div class="field col-6">
-              <label for="dataAtividade">Data da atividade <span class="required">*</span></label>
-              <input id="dataAtividade" name="dataAtividade" type="date" required>
+            <div class="field col-3">
+              <label for="anoReferencia">Ano de referência <span class="required">*</span></label>
+              <select id="anoReferencia" name="anoReferencia" required>
+                <option value="">Selecione o ano</option>
+                <option value="2025">2025</option>
+                <option value="2026">2026</option>
+                <option value="2027">2027</option>
+                <option value="2028">2028</option>
+                <option value="2029">2029</option>
+                <option value="2030">2030</option>
+              </select>
             </div>
 
-            <div class="field col-4">
-              <label for="anoReferencia">Ano de referência</label>
-              <input id="anoReferencia" name="anoReferencia" type="text" readonly placeholder="Automático">
-            </div>
-
-            <div class="field col-4">
-              <label for="mesReferencia">Mês de referência</label>
-              <input id="mesReferencia" name="mesReferencia" type="text" readonly placeholder="Automático">
-            </div>
-
-            <div class="field col-4">
-              <label for="tema">Tema do treinamento <span class="required">*</span></label>
-              <input id="tema" name="tema" type="text" required placeholder="Ex.: Segurança do paciente">
+            <div class="field col-3">
+              <label for="mesReferencia">Mês de referência <span class="required">*</span></label>
+              <select id="mesReferencia" name="mesReferencia" required>
+                <option value="">Selecione o mês</option>
+                <option value="janeiro">Janeiro</option>
+                <option value="fevereiro">Fevereiro</option>
+                <option value="março">Março</option>
+                <option value="abril">Abril</option>
+                <option value="maio">Maio</option>
+                <option value="junho">Junho</option>
+                <option value="julho">Julho</option>
+                <option value="agosto">Agosto</option>
+                <option value="setembro">Setembro</option>
+                <option value="outubro">Outubro</option>
+                <option value="novembro">Novembro</option>
+                <option value="dezembro">Dezembro</option>
+              </select>
             </div>
 
             <div class="field col-6">
@@ -631,10 +642,6 @@
 
         <div class="section-body">
           <div class="grid">
-            <div class="field col-12">
-              <label for="publicoAlvo">Público-alvo <span class="required">*</span></label>
-              <input id="publicoAlvo" name="publicoAlvo" type="text" required placeholder="Ex.: Enfermeiros e técnicos">
-            </div>
 
             <div class="field col-4">
               <label for="profissionaisAtivos">Profissionais ativos <span class="required">*</span></label>
@@ -722,29 +729,11 @@
     const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzF-716icpVvrnRksEh64tDfRXXJmg_o3Y7K-2GW1AetudNWaO-vO0pxPxpCoeNpNw33A/exec";
 
     const form = document.getElementById("educationForm");
-    const dateField = document.getElementById("dataAtividade");
-    const yearField = document.getElementById("anoReferencia");
-    const monthField = document.getElementById("mesReferencia");
     const activeField = document.getElementById("profissionaisAtivos");
     const trainedField = document.getElementById("profissionaisTreinados");
     const indexElement = document.getElementById("indiceParticipacao");
     const statusMessage = document.getElementById("statusMessage");
 
-    function updateReference() {
-      if (!dateField.value) {
-        yearField.value = "";
-        monthField.value = "";
-        return;
-      }
-
-      const [year, month, day] = dateField.value.split("-").map(Number);
-      const date = new Date(year, month - 1, day);
-
-      yearField.value = String(year);
-      monthField.value = new Intl.DateTimeFormat("pt-BR", {
-        month: "long"
-      }).format(date);
-    }
 
     function updateIndex() {
       const active = Number(activeField.value);
@@ -805,7 +794,6 @@
       };
     }
 
-    dateField.addEventListener("change", updateReference);
     activeField.addEventListener("input", updateIndex);
     trainedField.addEventListener("input", updateIndex);
 
@@ -847,8 +835,6 @@
 
         if (GOOGLE_APPS_SCRIPT_URL && result.ok) {
           form.reset();
-          yearField.value = "";
-          monthField.value = "";
           indexElement.textContent = "0,0%";
         }
       } catch (error) {
@@ -863,8 +849,6 @@
 
     form.addEventListener("reset", () => {
       setTimeout(() => {
-        yearField.value = "";
-        monthField.value = "";
         indexElement.textContent = "0,0%";
         statusMessage.className = "status";
         statusMessage.textContent = "";
