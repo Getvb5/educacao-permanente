@@ -715,16 +715,19 @@
     </form>
 
     <footer>
-      Protótipo funcional — Educação Permanente em Saúde
+      Educação Permanente em Saúde — Formulário de monitoramento
     </footer>
   </main>
 
   <script>
     /*
       INTEGRAÇÃO COM GOOGLE SHEETS
-      1. Publique um Google Apps Script como aplicativo da Web.
-      2. Cole a URL abaixo, entre aspas.
-      3. Enquanto a URL estiver vazia, o formulário funcionará em modo demonstração.
+      O Google Apps Script deve receber apenas a estrutura atual deste formulário:
+      unidade, anoReferencia, mesReferencia, responsavel, email,
+      profissionaisAtivos, profissionaisTreinados, indiceParticipacao,
+      linkListaPresenca, observacoes, declaracao e dataRegistro.
+
+      Não valide mais os campos removidos: dataAtividade, tema e publicoAlvo.
     */
     const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzF-716icpVvrnRksEh64tDfRXXJmg_o3Y7K-2GW1AetudNWaO-vO0pxPxpCoeNpNw33A/exec";
 
@@ -747,15 +750,27 @@
     }
 
     function collectData() {
-      const formData = new FormData(form);
-      const data = Object.fromEntries(formData.entries());
+      const profissionaisAtivos = Number(activeField.value);
+      const profissionaisTreinados = Number(trainedField.value);
 
-      data.dataRegistro = new Date().toISOString();
-      data.indiceParticipacao = activeField.value
-        ? Number(trainedField.value || 0) / Number(activeField.value)
-        : 0;
-
-      return data;
+      // Estrutura atual do formulário. Campos removidos não são enviados:
+      // dataAtividade, tema e publicoAlvo.
+      return {
+        unidade: document.getElementById("unidade").value,
+        anoReferencia: document.getElementById("anoReferencia").value,
+        mesReferencia: document.getElementById("mesReferencia").value,
+        responsavel: document.getElementById("responsavel").value.trim(),
+        email: document.getElementById("email").value.trim().toLowerCase(),
+        profissionaisAtivos,
+        profissionaisTreinados,
+        indiceParticipacao: profissionaisAtivos > 0
+          ? profissionaisTreinados / profissionaisAtivos
+          : 0,
+        linkListaPresenca: document.getElementById("linkListaPresenca").value.trim(),
+        observacoes: document.getElementById("observacoes").value.trim(),
+        declaracao: document.getElementById("declaracao").checked,
+        dataRegistro: new Date().toISOString()
+      };
     }
 
     async function sendData(data) {
@@ -783,14 +798,21 @@
       }
 
       const result = await response.json();
+      const message = result.mensagem ||
+        (result.sucesso
+          ? "Registro enviado com sucesso."
+          : "Não foi possível salvar o registro.");
+
+      if (/data da atividade|dataAtividade|tema do treinamento|publico.?alvo/i.test(message)) {
+        throw new Error(
+          "O Google Apps Script publicado ainda está usando a regra antiga. " +
+          "Atualize o backend para não exigir Data da atividade, Tema do treinamento ou Público-alvo."
+        );
+      }
 
       return {
         ok: result.sucesso === true,
-        message:
-          result.mensagem ||
-          (result.sucesso
-            ? "Registro enviado com sucesso."
-            : "Não foi possível salvar o registro.")
+        message
       };
     }
 
@@ -840,7 +862,8 @@
       } catch (error) {
         console.error(error);
         statusMessage.className = "status error";
-        statusMessage.textContent = "Não foi possível enviar o registro. Verifique a conexão e a configuração do Google Apps Script.";
+        statusMessage.textContent = error.message ||
+          "Não foi possível enviar o registro. Verifique a conexão e a configuração do Google Apps Script.";
       } finally {
         submitButton.disabled = false;
         submitButton.textContent = "Enviar registro";
