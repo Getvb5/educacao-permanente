@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Educação Permanente</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --roxo:#6d28d9;
+      --roxo-escuro:#4c1d95;
+      --fundo:#f5f3ff;
+      --texto:#1f2937;
+      --suave:#6b7280;
+      --borda:#e5e7eb;
+    }
+    * { box-sizing:border-box; }
+    body {
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      background:linear-gradient(180deg,#ede9fe 0,#f5f3ff 260px);
+      color:var(--texto);
+    }
+    .container { width:min(1250px,calc(100% - 28px)); margin:auto; padding:28px 0 48px; }
+    .topo { display:flex; justify-content:space-between; gap:18px; align-items:flex-start; margin-bottom:20px; }
+    h1 { margin:0 0 6px; color:var(--roxo-escuro); }
+    p { margin:0; color:var(--suave); }
+    .acoes { display:flex; gap:10px; flex-wrap:wrap; }
+    button,.botao {
+      border:0; border-radius:10px; padding:11px 16px; font-weight:700;
+      cursor:pointer; text-decoration:none; font-size:14px;
+    }
+    .primario { background:var(--roxo); color:white; }
+    .secundario { background:white; color:var(--roxo-escuro); border:1px solid #c4b5fd; }
+    .painel {
+      background:white; border:1px solid rgba(109,40,217,.10);
+      border-radius:16px; box-shadow:0 12px 30px rgba(76,29,149,.08);
+    }
+    .filtros {
+      display:grid; grid-template-columns:1fr 1fr auto; gap:14px;
+      padding:18px; align-items:end; margin-bottom:18px;
+    }
+    label { display:block; font-size:13px; font-weight:700; margin-bottom:6px; color:#4b5563; }
+    select {
+      width:100%; min-height:44px; border:1px solid var(--borda);
+      border-radius:10px; padding:9px 12px; background:white;
+    }
+    .cards { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:18px; }
+    .card { padding:20px; }
+    .rotulo { color:var(--suave); font-size:14px; font-weight:700; margin-bottom:12px; }
+    .valor { color:var(--roxo-escuro); font-weight:800; font-size:34px; }
+    .detalhe { color:var(--suave); font-size:12px; margin-top:8px; }
+    .graficos { display:grid; grid-template-columns:1.1fr .9fr; gap:18px; margin-bottom:18px; }
+    .grafico { padding:20px; min-height:390px; }
+    h2 { margin:0 0 16px; color:var(--roxo-escuro); font-size:17px; }
+    .canvas { position:relative; height:320px; }
+    .tabela { padding:20px; }
+    .tabela-topo { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+    .tabela-wrap { overflow-x:auto; border:1px solid var(--borda); border-radius:12px; }
+    table { width:100%; border-collapse:collapse; min-width:760px; }
+    th,td { padding:12px 14px; text-align:left; border-bottom:1px solid var(--borda); font-size:13px; }
+    th { background:#f9fafb; color:#4b5563; font-size:12px; text-transform:uppercase; }
+    .estado { padding:45px; text-align:center; color:var(--suave); }
+    .bom { color:#15803d; font-weight:800; }
+    .atencao { color:#b45309; font-weight:800; }
+    .baixo { color:#b91c1c; font-weight:800; }
+    footer { text-align:center; color:var(--suave); font-size:12px; margin-top:18px; }
+    @media(max-width:900px) {
+      .cards { grid-template-columns:repeat(2,1fr); }
+      .graficos { grid-template-columns:1fr; }
+    }
+    @media(max-width:620px) {
+      .topo { flex-direction:column; }
+      .filtros,.cards { grid-template-columns:1fr; }
+      .acoes { width:100%; }
+      .acoes>* { flex:1; text-align:center; }
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <header class="topo">
+      <div>
+        <h1>Dashboard de Educação Permanente</h1>
+        <p>Resultados por unidade e mês de referência.</p>
+      </div>
+      <div class="acoes">
+        <a href="index.html" class="botao secundario">Voltar ao formulário</a>
+        <button id="atualizar" class="primario">Atualizar dados</button>
+      </div>
+    </header>
+
+    <section class="painel filtros">
+      <div>
+        <label for="mes">Mês de referência</label>
+        <select id="mes"><option value="">Todos os meses</option></select>
+      </div>
+      <div>
+        <label for="unidade">Unidade de saúde</label>
+        <select id="unidade"><option value="">Todas as unidades</option></select>
+      </div>
+      <button id="limpar" class="secundario">Limpar filtros</button>
+    </section>
+
+    <section id="estado" class="painel estado">Carregando dados...</section>
+
+    <div id="conteudo" hidden>
+      <section class="cards">
+        <article class="painel card">
+          <div class="rotulo">Profissionais ativos</div>
+          <div id="ativos" class="valor">0</div>
+          <div class="detalhe">Soma dos registros filtrados</div>
+        </article>
+        <article class="painel card">
+          <div class="rotulo">Profissionais treinados</div>
+          <div id="treinados" class="valor">0</div>
+          <div class="detalhe">Soma dos registros filtrados</div>
+        </article>
+        <article class="painel card">
+          <div class="rotulo">Índice geral</div>
+          <div id="indice" class="valor">0%</div>
+          <div class="detalhe">Treinados ÷ ativos</div>
+        </article>
+        <article class="painel card">
+          <div class="rotulo">Unidades com registro</div>
+          <div id="qtdUnidades" class="valor">0</div>
+          <div id="qtdRegistros" class="detalhe">0 registros</div>
+        </article>
+      </section>
+
+      <section class="graficos">
+        <article class="painel grafico">
+          <h2>Índice de participação por unidade</h2>
+          <div class="canvas"><canvas id="graficoUnidades"></canvas></div>
+        </article>
+        <article class="painel grafico">
+          <h2>Evolução por mês</h2>
+          <div class="canvas"><canvas id="graficoMeses"></canvas></div>
+        </article>
+      </section>
+
+      <section class="painel tabela">
+        <div class="tabela-topo">
+          <h2>Registros detalhados</h2>
+          <button id="exportar" class="secundario">Exportar CSV</button>
+        </div>
+        <div class="tabela-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Data</th><th>Unidade</th><th>Mês</th>
+                <th>Ativos</th><th>Treinados</th><th>Índice</th>
+              </tr>
+            </thead>
+            <tbody id="corpo"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <footer>Dados consolidados da aba BASE_DADOS.</footer>
+  </main>
+
+  <script>
+    const URL_API = "https://script.google.com/macros/s/AKfycbzF-716icpVvrnRksEh64tDfRXXJmg_o3Y7K-2GW1AetudNWaO-vO0pxPxpCoeNpNw33A/exec?acao=dados";
+    let base = [];
+    let filtrados = [];
+    let chartUnidades;
+    let chartMeses;
+
+    const $ = id => document.getElementById(id);
+    const numero = v => new Intl.NumberFormat("pt-BR",{maximumFractionDigits:0}).format(v || 0);
+    const percentual = v => new Intl.NumberFormat("pt-BR",{style:"percent",minimumFractionDigits:1,maximumFractionDigits:1}).format(v || 0);
+
+    async function carregar() {
+      $("estado").hidden = false;
+      $("estado").textContent = "Carregando dados...";
+      $("conteudo").hidden = true;
+      try {
+        const resposta = await fetch(URL_API + "&t=" + Date.now(), {cache:"no-store"});
+        const retorno = await resposta.json();
+        if (!retorno.sucesso) throw new Error(retorno.mensagem || "Falha na API.");
+        base = (retorno.dados || []).map(d => ({
+          dataRegistro:String(d.dataRegistro || ""),
+          unidade:String(d.unidade || "").trim(),
+          mesReferencia:String(d.mesReferencia || "").trim(),
+          profissionaisAtivos:Number(d.profissionaisAtivos) || 0,
+          profissionaisTreinados:Number(d.profissionaisTreinados) || 0,
+          indiceParticipacao:Number(d.indiceParticipacao) || 0
+        }));
+        preencherFiltros();
+        aplicarFiltros();
+        $("estado").hidden = true;
+        $("conteudo").hidden = false;
+      } catch(erro) {
+        $("estado").textContent = "Erro ao carregar: " + erro.message + " Atualize e implante novamente o Apps Script.";
+      }
+    }
+
+    function preencherFiltros() {
+      const meses = [...new Set(base.map(d=>d.mesReferencia).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"pt-BR"));
+      const unidades = [...new Set(base.map(d=>d.unidade).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"pt-BR"));
+      $("mes").innerHTML = '<option value="">Todos os meses</option>' + meses.map(v=>`<option>${escapar(v)}</option>`).join("");
+      $("unidade").innerHTML = '<option value="">Todas as unidades</option>' + unidades.map(v=>`<option>${escapar(v)}</option>`).join("");
+    }
+
+    function aplicarFiltros() {
+      const mes = $("mes").value;
+      const unidade = $("unidade").value;
+      filtrados = base.filter(d => (!mes || d.mesReferencia===mes) && (!unidade || d.unidade===unidade));
+      atualizarCards();
+      atualizarTabela();
+      atualizarGraficos();
+    }
+
+    function atualizarCards() {
+      const ativos = filtrados.reduce((s,d)=>s+d.profissionaisAtivos,0);
+      const treinados = filtrados.reduce((s,d)=>s+d.profissionaisTreinados,0);
+      $("ativos").textContent = numero(ativos);
+      $("treinados").textContent = numero(treinados);
+      $("indice").textContent = percentual(ativos ? treinados/ativos : 0);
+      $("qtdUnidades").textContent = numero(new Set(filtrados.map(d=>d.unidade).filter(Boolean)).size);
+      $("qtdRegistros").textContent = numero(filtrados.length) + " registro(s)";
+    }
+
+    function atualizarTabela() {
+      $("corpo").innerHTML = [...filtrados].reverse().map(d => {
+        const classe = d.indiceParticipacao >= .8 ? "bom" : d.indiceParticipacao >= .6 ? "atencao" : "baixo";
+        return `<tr>
+          <td>${escapar(d.dataRegistro)}</td>
+          <td>${escapar(d.unidade)}</td>
+          <td>${escapar(d.mesReferencia)}</td>
+          <td>${numero(d.profissionaisAtivos)}</td>
+          <td>${numero(d.profissionaisTreinados)}</td>
+          <td class="${classe}">${percentual(d.indiceParticipacao)}</td>
+        </tr>`;
+      }).join("") || '<tr><td colspan="6">Nenhum registro encontrado.</td></tr>';
+    }
+
+    function agrupar(campo) {
+      return filtrados.reduce((r,d)=>{
+        const chave = d[campo] || "Não informado";
+        r[chave] ||= {ativos:0,treinados:0};
+        r[chave].ativos += d.profissionaisAtivos;
+        r[chave].treinados += d.profissionaisTreinados;
+        return r;
+      },{});
+    }
+
+    function atualizarGraficos() {
+      const unidades = Object.entries(agrupar("unidade"))
+        .map(([nome,v])=>({nome,indice:v.ativos ? v.treinados/v.ativos*100 : 0}))
+        .sort((a,b)=>b.indice-a.indice).slice(0,15);
+      const meses = Object.entries(agrupar("mesReferencia"))
+        .map(([nome,v])=>({nome,indice:v.ativos ? v.treinados/v.ativos*100 : 0}))
+        .sort((a,b)=>a.nome.localeCompare(b.nome,"pt-BR"));
+
+      if (chartUnidades) chartUnidades.destroy();
+      if (chartMeses) chartMeses.destroy();
+
+      chartUnidades = new Chart($("graficoUnidades"),{
+        type:"bar",
+        data:{labels:unidades.map(x=>x.nome),datasets:[{data:unidades.map(x=>x.indice),backgroundColor:"rgba(109,40,217,.72)",borderRadius:6}]},
+        options:{indexAxis:"y",responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,max:100,ticks:{callback:v=>v+"%"}}}}
+      });
+
+      chartMeses = new Chart($("graficoMeses"),{
+        type:"line",
+        data:{labels:meses.map(x=>x.nome),datasets:[{data:meses.map(x=>x.indice),borderColor:"#6d28d9",backgroundColor:"rgba(109,40,217,.12)",fill:true,tension:.3}]},
+        options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,max:100,ticks:{callback:v=>v+"%"}}}}
+      });
+    }
+
+    function exportarCsv() {
+      const linhas = [["DATA","UNIDADE","MES","ATIVOS","TREINADOS","INDICE"],
+        ...filtrados.map(d=>[d.dataRegistro,d.unidade,d.mesReferencia,d.profissionaisAtivos,d.profissionaisTreinados,(d.indiceParticipacao*100).toFixed(1)+"%"])];
+      const csv = linhas.map(l=>l.map(v=>`"${String(v).replaceAll('"','""')}"`).join(";")).join("\n");
+      const blob = new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href=url; a.download="educacao_permanente.csv"; a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function escapar(v) {
+      return String(v ?? "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
+    }
+
+    $("mes").addEventListener("change",aplicarFiltros);
+    $("unidade").addEventListener("change",aplicarFiltros);
+    $("limpar").addEventListener("click",()=>{$("mes").value="";$("unidade").value="";aplicarFiltros();});
+    $("atualizar").addEventListener("click",carregar);
+    $("exportar").addEventListener("click",exportarCsv);
+    carregar();
+  </script>
+</body>
+</html>
