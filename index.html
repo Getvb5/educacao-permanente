@@ -550,12 +550,14 @@
     <section class="intro">
       <h2>Registro de Ações de Educação Permanente</h2>
       <p>
-        Preencha os dados mensais da unidade. As informações serão utilizadas para o acompanhamento dos profissionais ativos, profissionais treinados e do índice de participação.
+        Preencha os dados da atividade realizada. As informações poderão ser
+        utilizadas para o acompanhamento das unidades e para o cálculo dos
+        indicadores de participação.
       </p>
       <div class="required-note">* Campo obrigatório</div>
     </section>
 
-<form id="educationForm" novalidate>
+    <form id="educationForm" novalidate>
       <section class="section">
         <div class="section-heading">
           <span class="section-number">1</span>
@@ -568,65 +570,54 @@
               <label for="unidade">Unidade de Saúde <span class="required">*</span></label>
               <select id="unidade" name="unidade" required>
                 <option value="">Selecione a unidade</option>
-                <option value="Hosp Ped Helena Moura">Hosp Ped Helena Moura</option>
-                <option value="Hosp Ped Maria Cravo">Hosp Ped Maria Cravo</option>
-                <option value="Poli Mat Barros Lima">Poli Mat Barros Lima</option>
-                <option value="Poli Mat Arnaldo Marques">Poli Mat Arnaldo Marques</option>
-                <option value="Mat Bandeira Filho">Mat Bandeira Filho</option>
-                <option value="Poli Amaury Coutinho">Poli Amaury Coutinho</option>
-                <option value="Poli Agamenon Magalhães">Poli Agamenon Magalhães</option>
-                <option value="Poli Gouveia de Barros">Poli Gouveia de Barros</option>
-                <option value="Policlínica Centro">Policlínica Centro</option>
-                <option value="Poli Valdemar Oliveira">Poli Valdemar Oliveira</option>
-                <option value="Poli Albert Sabin">Poli Albert Sabin</option>
-                <option value="Poli Salomão Kelner">Poli Salomão Kelner</option>
-                <option value="Poli Lessa de Andrade">Poli Lessa de Andrade</option>
-                <option value="Policlínica do Pina">Policlínica do Pina</option>
-                <option value="Poli Clementino Fraga">Poli Clementino Fraga</option>
-                <option value="Centro Méd José Ermírio">Centro Méd José Ermírio</option>
-                <option value="Central de Alergologia">Central de Alergologia</option>
+              <option value="Hosp Ped Helena Moura">Hosp Ped Helena Moura</option>
+              <option value="Hosp Ped Maria Cravo">Hosp Ped Maria Cravo</option>
+              <option value="Poli Mat Barros Lima">Poli Mat Barros Lima</option>
+              <option value="Poli Mat Arnaldo Marques">Poli Mat Arnaldo Marques</option>
+              <option value="Mat Bandeira Filho">Mat Bandeira Filho</option>
+              <option value="Poli Amaury Coutinho">Poli Amaury Coutinho</option>
+              <option value="Poli Agamenon Magalhães">Poli Agamenon Magalhães</option>
+              <option value="Poli Gouveia de Barros">Poli Gouveia de Barros</option>
+              <option value="Policlínica Centro">Policlínica Centro</option>
+              <option value="Poli Valdemar Oliveira">Poli Valdemar Oliveira</option>
+              <option value="Poli Albert Sabin">Poli Albert Sabin</option>
+              <option value="Poli Salomão Kelner">Poli Salomão Kelner</option>
+              <option value="Poli Lessa de Andrade">Poli Lessa de Andrade</option>
+              <option value="Policlínica do Pina">Policlínica do Pina</option>
+              <option value="Poli Clementino Fraga">Poli Clementino Fraga</option>
+              <option value="Centro Méd José Ermírio">Centro Méd José Ermírio</option>
+              <option value="Central de Alergologia">Central de Alergologia</option>
               </select>
             </div>
 
             <div class="field col-6">
-              <label for="mesReferencia">Mês de referência <span class="required">*</span></label>
-              <select id="mesReferencia" name="mesReferencia" required>
-                <option value="">Selecione o mês</option>
-                <option value="Janeiro">Janeiro</option>
-                <option value="Fevereiro">Fevereiro</option>
-                <option value="Março">Março</option>
-                <option value="Abril">Abril</option>
-                <option value="Maio">Maio</option>
-                <option value="Junho">Junho</option>
-                <option value="Julho">Julho</option>
-                <option value="Agosto">Agosto</option>
-                <option value="Setembro">Setembro</option>
-                <option value="Outubro">Outubro</option>
-                <option value="Novembro">Novembro</option>
-                <option value="Dezembro">Dezembro</option>
-              </select>
+              <label for="dataAtividade">Data da atividade <span class="required">*</span></label>
+              <input id="dataAtividade" name="dataAtividade" type="date" required>
+            </div>
+
+            <div class="field col-4">
+              <label for="anoReferencia">Ano de referência</label>
+              <input id="anoReferencia" name="anoReferencia" type="text" readonly placeholder="Automático">
+            </div>
+
+            <div class="field col-4">
+              <label for="mesReferencia">Mês de referência</label>
+              <input id="mesReferencia" name="mesReferencia" type="text" readonly placeholder="Automático">
+            </div>
+
+            <div class="field col-4">
+              <label for="tema">Tema do treinamento <span class="required">*</span></label>
+              <input id="tema" name="tema" type="text" required placeholder="Ex.: Segurança do paciente">
             </div>
 
             <div class="field col-6">
               <label for="responsavel">Responsável pelo registro <span class="required">*</span></label>
-              <input
-                id="responsavel"
-                name="responsavel"
-                type="text"
-                required
-                placeholder="Digite o nome completo"
-              >
+              <input id="responsavel" name="responsavel" type="text" required placeholder="Digite o nome completo">
             </div>
 
             <div class="field col-6">
               <label for="email">E-mail institucional <span class="required">*</span></label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                placeholder="nome@recife.pe.gov.br"
-              >
+              <input id="email" name="email" type="email" required placeholder="nome@recife.pe.gov.br">
             </div>
           </div>
         </div>
@@ -640,40 +631,65 @@
 
         <div class="section-body">
           <div class="grid">
-            <div class="field col-4">
-              <label for="profissionaisAtivos">
-                Profissionais ativos <span class="required">*</span>
-              </label>
-              <input
-                id="profissionaisAtivos"
-                name="profissionaisAtivos"
-                type="number"
-                min="1"
-                step="1"
-                required
-                placeholder="0"
-              >
+            <div class="field col-12">
+              <label for="publicoAlvo">Público-alvo <span class="required">*</span></label>
+              <input id="publicoAlvo" name="publicoAlvo" type="text" required placeholder="Ex.: Enfermeiros e técnicos">
             </div>
 
             <div class="field col-4">
-              <label for="profissionaisTreinados">
-                Profissionais treinados <span class="required">*</span>
-              </label>
-              <input
-                id="profissionaisTreinados"
-                name="profissionaisTreinados"
-                type="number"
-                min="0"
-                step="1"
-                required
-                placeholder="0"
-              >
+              <label for="profissionaisAtivos">Profissionais ativos <span class="required">*</span></label>
+              <input id="profissionaisAtivos" name="profissionaisAtivos" type="number" min="1" step="1" required placeholder="0">
+            </div>
+
+            <div class="field col-4">
+              <label for="profissionaisTreinados">Profissionais treinados <span class="required">*</span></label>
+              <input id="profissionaisTreinados" name="profissionaisTreinados" type="number" min="0" step="1" required placeholder="0">
             </div>
 
             <div class="field col-4">
               <div class="metric-card" aria-live="polite">
                 <span>Índice de participação</span>
                 <strong id="indiceParticipacao">0,0%</strong>
+              </div>
+            </div>
+</div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-heading">
+          <span class="section-number">3</span>
+          EVIDÊNCIAS E OBSERVAÇÕES
+        </div>
+
+        <div class="section-body">
+          <div class="grid">
+            <div class="field col-12">
+              <label for="linkListaPresenca">Lista de presença — link do Google Drive</label>
+              <input
+                id="linkListaPresenca"
+                name="linkListaPresenca"
+                type="url"
+                placeholder="https://drive.google.com/..."
+              >
+              <small class="helper">
+                Campo facultativo. Cole o link do arquivo no Google Drive com acesso configurado
+                como “Qualquer pessoa com o link — Leitor”.
+              </small>
+            </div>
+
+            <div class="field col-12">
+              <label for="observacoes">Observações</label>
+              <textarea id="observacoes" name="observacoes" placeholder="Insira informações adicionais que julgar necessárias."></textarea>
+            </div>
+
+            <div class="field col-12">
+              <div class="consent">
+                <input id="declaracao" name="declaracao" type="checkbox" required>
+                <label for="declaracao">
+                  Declaro que as informações registradas são verdadeiras e correspondem
+                  à atividade realizada. <span class="required">*</span>
+                </label>
               </div>
             </div>
           </div>
@@ -696,21 +712,39 @@
     </footer>
   </main>
 
-<script>
+  <script>
     /*
       INTEGRAÇÃO COM GOOGLE SHEETS
       1. Publique um Google Apps Script como aplicativo da Web.
       2. Cole a URL abaixo, entre aspas.
       3. Enquanto a URL estiver vazia, o formulário funcionará em modo demonstração.
     */
-    const GOOGLE_APPS_SCRIPT_URL = 
-      "https://script.google.com/macros/s/AKfycbzF-716icpVvrnRksEh64tDfRXXJmg_o3Y7K-2GW1AetudNWaO-vO0pxPxpCoeNpNw33A/exec";
+    const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzF-716icpVvrnRksEh64tDfRXXJmg_o3Y7K-2GW1AetudNWaO-vO0pxPxpCoeNpNw33A/exec";
 
     const form = document.getElementById("educationForm");
+    const dateField = document.getElementById("dataAtividade");
+    const yearField = document.getElementById("anoReferencia");
+    const monthField = document.getElementById("mesReferencia");
     const activeField = document.getElementById("profissionaisAtivos");
     const trainedField = document.getElementById("profissionaisTreinados");
     const indexElement = document.getElementById("indiceParticipacao");
     const statusMessage = document.getElementById("statusMessage");
+
+    function updateReference() {
+      if (!dateField.value) {
+        yearField.value = "";
+        monthField.value = "";
+        return;
+      }
+
+      const [year, month, day] = dateField.value.split("-").map(Number);
+      const date = new Date(year, month - 1, day);
+
+      yearField.value = String(year);
+      monthField.value = new Intl.DateTimeFormat("pt-BR", {
+        month: "long"
+      }).format(date);
+    }
 
     function updateIndex() {
       const active = Number(activeField.value);
@@ -723,23 +757,12 @@
       }) + "%";
     }
 
-    function validateTrainedQuantity() {
-      const active = Number(activeField.value);
-      const trained = Number(trainedField.value);
-
-      trainedField.setCustomValidity(
-        active > 0 && trained > active
-          ? "A quantidade de profissionais treinados não pode ser maior que a quantidade de profissionais ativos."
-          : ""
-      );
-    }
-
     function collectData() {
       const formData = new FormData(form);
       const data = Object.fromEntries(formData.entries());
 
       data.dataRegistro = new Date().toISOString();
-      data.indiceParticipacao = Number(activeField.value) > 0
+      data.indiceParticipacao = activeField.value
         ? Number(trainedField.value || 0) / Number(activeField.value)
         : 0;
 
@@ -749,43 +772,62 @@
     async function sendData(data) {
       if (!GOOGLE_APPS_SCRIPT_URL) {
         console.table(data);
+
         return {
           ok: true,
-          message: "Registro validado em modo de demonstração. Para gravar na planilha, configure a URL do Google Apps Script."
+          message: "Registro validado em modo de demonstração."
         };
       }
 
-      await fetch(GOOGLE_APPS_SCRIPT_URL, {
+      const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
         method: "POST",
-        mode: "no-cors",
         headers: {
           "Content-Type": "text/plain;charset=utf-8"
         },
         body: JSON.stringify(data)
       });
 
+      if (!response.ok) {
+        throw new Error(
+          `Falha no envio. Código HTTP: ${response.status}`
+        );
+      }
+
+      const result = await response.json();
+
       return {
-        ok: true,
-        message: "Registro enviado com sucesso."
+        ok: result.sucesso === true,
+        message:
+          result.mensagem ||
+          (result.sucesso
+            ? "Registro enviado com sucesso."
+            : "Não foi possível salvar o registro.")
       };
     }
 
-    activeField.addEventListener("input", () => {
-      updateIndex();
-      validateTrainedQuantity();
-    });
+    dateField.addEventListener("change", updateReference);
+    activeField.addEventListener("input", updateIndex);
+    trainedField.addEventListener("input", updateIndex);
 
     trainedField.addEventListener("input", () => {
-      updateIndex();
-      validateTrainedQuantity();
+      const active = Number(activeField.value);
+      const trained = Number(trainedField.value);
+
+      trainedField.setCustomValidity(
+        active > 0 && trained > active
+          ? "A quantidade treinada não pode ser maior que a quantidade de profissionais ativos."
+          : ""
+      );
+    });
+
+    activeField.addEventListener("input", () => {
+      trainedField.dispatchEvent(new Event("input"));
     });
 
     form.addEventListener("submit", async event => {
       event.preventDefault();
       statusMessage.className = "status";
       statusMessage.textContent = "";
-
-      validateTrainedQuantity();
 
       if (!form.checkValidity()) {
         form.reportValidity();
@@ -805,13 +847,14 @@
 
         if (GOOGLE_APPS_SCRIPT_URL && result.ok) {
           form.reset();
+          yearField.value = "";
+          monthField.value = "";
           indexElement.textContent = "0,0%";
         }
       } catch (error) {
         console.error(error);
         statusMessage.className = "status error";
-        statusMessage.textContent =
-          "Não foi possível enviar o registro. Verifique a conexão e a configuração do Google Apps Script.";
+        statusMessage.textContent = "Não foi possível enviar o registro. Verifique a conexão e a configuração do Google Apps Script.";
       } finally {
         submitButton.disabled = false;
         submitButton.textContent = "Enviar registro";
@@ -820,10 +863,11 @@
 
     form.addEventListener("reset", () => {
       setTimeout(() => {
+        yearField.value = "";
+        monthField.value = "";
         indexElement.textContent = "0,0%";
         statusMessage.className = "status";
         statusMessage.textContent = "";
-        trainedField.setCustomValidity("");
       }, 0);
     });
   </script>
