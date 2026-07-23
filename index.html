@@ -8,18 +8,18 @@
 
   <style>
     :root {
-      --primary: #5527a5;
-      --primary-dark: #3c187f;
-      --primary-light: #f1eafd;
-      --accent: #7244c7;
-      --background: #f7f5fb;
+      --primary: #105bab;
+      --primary-dark: #063b73;
+      --primary-light: #eaf3fb;
+      --accent: #f8ef1f;
+      --background: #f4f8fc;
       --surface: #ffffff;
-      --text: #24212b;
-      --muted: #6f6a78;
-      --border: #ded9e7;
+      --text: #1f2937;
+      --muted: #5f6b7a;
+      --border: #d9e4ef;
       --danger: #c93434;
       --success: #257a4c;
-      --shadow: 0 16px 40px rgba(50, 29, 87, .10);
+      --shadow: 0 16px 40px rgba(6, 59, 115, .10);
       --radius: 16px;
     }
 
@@ -33,7 +33,7 @@
       font-family: Inter, "Segoe UI", Arial, sans-serif;
       color: var(--text);
       background:
-        radial-gradient(circle at top left, rgba(114, 68, 199, .13), transparent 30rem),
+        radial-gradient(circle at top left, rgba(16, 91, 171, .14), transparent 30rem),
         var(--background);
     }
 
@@ -56,7 +56,7 @@
       min-height: 155px;
       padding: 30px 38px;
       color: #fff;
-      background: linear-gradient(125deg, var(--primary-dark), var(--primary), #6631b8);
+      background: linear-gradient(125deg, var(--primary-dark), var(--primary), #2878c7);
       border-radius: 20px;
       box-shadow: var(--shadow);
     }
@@ -124,7 +124,7 @@
       margin-top: 18px;
       padding: 26px 30px;
       background: var(--surface);
-      border-top: 6px solid var(--primary);
+      border-top: 6px solid var(--accent);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
     }
@@ -155,20 +155,22 @@
       margin-bottom: 18px;
       overflow: hidden;
       background: var(--surface);
-      border: 1px solid rgba(82, 49, 130, .10);
+      border: 1px solid rgba(16, 91, 171, .12);
       border-radius: var(--radius);
-      box-shadow: 0 10px 30px rgba(50, 29, 87, .06);
+      box-shadow: 0 10px 30px rgba(6, 59, 115, .07);
     }
 
     .section-heading {
+      position: relative;
       display: flex;
       align-items: center;
       gap: 12px;
       padding: 17px 24px;
-      background: linear-gradient(90deg, var(--primary-light), #fbf9ff);
+      background: linear-gradient(90deg, var(--primary-light), #ffffff);
       color: var(--primary-dark);
       font-weight: 800;
       letter-spacing: .01em;
+      border-bottom: 3px solid rgba(248, 239, 31, .75);
     }
 
     .section-number {
@@ -178,6 +180,7 @@
       height: 31px;
       color: white;
       background: var(--primary);
+      border: 2px solid var(--accent);
       border-radius: 50%;
     }
 
@@ -223,13 +226,13 @@
     }
 
     input:focus, select:focus, textarea:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 4px rgba(114, 68, 199, .13);
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(248, 239, 31, .42);
     }
 
     input[readonly] {
       color: #5c5665;
-      background: #f5f3f8;
+      background: #f2f6fa;
     }
 
     textarea {
@@ -286,7 +289,7 @@
       content: "";
       width: 16px;
       height: 16px;
-      border: 2px solid #aaa4b3;
+      border: 2px solid #8aa6bf;
       border-radius: 50%;
       box-shadow: inset 0 0 0 4px white;
     }
@@ -305,8 +308,8 @@
     .metric-card {
       height: 100%;
       padding: 18px;
-      background: linear-gradient(145deg, #faf8ff, #f0e9fc);
-      border: 1px solid #e2d7f4;
+      background: linear-gradient(145deg, #ffffff, #eaf3fb);
+      border: 1px solid #c9ddec;
       border-radius: 12px;
     }
 
@@ -333,8 +336,8 @@
       padding: 18px;
       text-align: center;
       cursor: pointer;
-      background: #fcfbfe;
-      border: 1.5px dashed #b9a6d8;
+      background: #fbfdff;
+      border: 1.5px dashed #8fb5d5;
       border-radius: 12px;
       transition: .18s ease;
     }
@@ -370,7 +373,7 @@
       align-items: flex-start;
       gap: 10px;
       padding: 15px;
-      background: #faf9fc;
+      background: #f8fbfe;
       border-radius: 10px;
     }
 
@@ -417,13 +420,14 @@
     .primary-button {
       color: white;
       background: linear-gradient(110deg, var(--primary-dark), var(--primary));
-      box-shadow: 0 10px 22px rgba(85, 39, 165, .22);
+      border-bottom: 4px solid var(--accent);
+      box-shadow: 0 10px 22px rgba(16, 91, 171, .24);
     }
 
     .secondary-button {
       color: var(--primary);
       background: transparent;
-      border: 1px solid #cdbde7;
+      border: 1px solid #9fc1df;
     }
 
     .privacy {
@@ -452,6 +456,97 @@
       color: #8f2828;
       background: #fdecec;
       border: 1px solid #f2b4b4;
+    }
+
+    .success-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(6, 59, 115, .62);
+      backdrop-filter: blur(4px);
+    }
+
+    .success-modal.visible {
+      display: flex;
+    }
+
+    .success-dialog {
+      width: min(440px, 100%);
+      padding: 30px 26px 24px;
+      border: 1px solid rgba(16, 91, 171, .18);
+      border-top: 7px solid var(--accent);
+      border-radius: 18px;
+      background: var(--white);
+      box-shadow: 0 24px 70px rgba(6, 59, 115, .28);
+      text-align: center;
+      animation: confirmacaoEntrada .24s ease-out;
+    }
+
+    .success-icon {
+      display: grid;
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 18px;
+      place-items: center;
+      border: 4px solid var(--accent);
+      border-radius: 50%;
+      color: white;
+      background: var(--primary);
+      font-size: 38px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .success-dialog h2 {
+      margin: 0 0 10px;
+      color: var(--primary-dark);
+      font-size: 1.45rem;
+    }
+
+    .success-dialog p {
+      margin: 0 0 22px;
+      color: var(--text);
+      line-height: 1.55;
+    }
+
+    .success-close {
+      min-width: 170px;
+      padding: 12px 20px;
+      border: 0;
+      border-bottom: 4px solid var(--accent);
+      border-radius: 10px;
+      color: white;
+      background: linear-gradient(110deg, var(--primary-dark), var(--primary));
+      box-shadow: 0 8px 18px rgba(16, 91, 171, .22);
+      cursor: pointer;
+      font: inherit;
+      font-weight: 800;
+    }
+
+    .success-close:focus {
+      outline: 4px solid rgba(248, 239, 31, .48);
+      outline-offset: 3px;
+    }
+
+    @keyframes confirmacaoEntrada {
+      from {
+        opacity: 0;
+        transform: translateY(16px) scale(.97);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .success-dialog {
+        animation: none;
+      }
     }
 
     footer {
@@ -644,8 +739,22 @@
           <div class="grid">
 
             <div class="field col-4">
-              <label for="profissionaisAtivos">Profissionais ativos <span class="required">*</span></label>
-              <input id="profissionaisAtivos" name="profissionaisAtivos" type="number" min="1" step="1" required placeholder="0">
+              <label for="profissionaisAtivos">
+                Profissionais ativos na unidade <span class="required">*</span>
+              </label>
+              <input
+                id="profissionaisAtivos"
+                name="profissionaisAtivos"
+                type="number"
+                min="1"
+                step="1"
+                required
+                placeholder="0"
+                aria-describedby="ajudaProfissionaisAtivos"
+              >
+              <small id="ajudaProfissionaisAtivos" class="helper">
+                Considere todos os recursos humanos da unidade.
+              </small>
             </div>
 
             <div class="field col-4">
@@ -719,6 +828,27 @@
     </footer>
   </main>
 
+  <div
+    id="successModal"
+    class="success-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="successModalTitle"
+    aria-describedby="successModalText"
+    aria-hidden="true"
+  >
+    <div class="success-dialog">
+      <div class="success-icon" aria-hidden="true">✓</div>
+      <h2 id="successModalTitle">Registro realizado com sucesso!</h2>
+      <p id="successModalText">
+        As informações foram registradas e enviadas para a base de dados.
+      </p>
+      <button id="successCloseButton" class="success-close" type="button">
+        Fechar
+      </button>
+    </div>
+  </div>
+
   <script>
     /*
       INTEGRAÇÃO COM GOOGLE SHEETS
@@ -733,7 +863,50 @@
     const trainedField = document.getElementById("profissionaisTreinados");
     const indexElement = document.getElementById("indiceParticipacao");
     const statusMessage = document.getElementById("statusMessage");
+    const successModal = document.getElementById("successModal");
+    const successCloseButton = document.getElementById("successCloseButton");
+    let ultimoElementoComFoco = null;
 
+
+    function abrirConfirmacaoSucesso(mensagem) {
+      ultimoElementoComFoco = document.activeElement;
+
+      document.getElementById("successModalText").textContent =
+        mensagem || "As informações foram registradas e enviadas para a base de dados.";
+
+      successModal.classList.add("visible");
+      successModal.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+
+      window.setTimeout(() => successCloseButton.focus(), 0);
+    }
+
+    function fecharConfirmacaoSucesso() {
+      successModal.classList.remove("visible");
+      successModal.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+
+      if (ultimoElementoComFoco) {
+        ultimoElementoComFoco.focus();
+      }
+    }
+
+    successCloseButton.addEventListener("click", fecharConfirmacaoSucesso);
+
+    successModal.addEventListener("click", event => {
+      if (event.target === successModal) {
+        fecharConfirmacaoSucesso();
+      }
+    });
+
+    document.addEventListener("keydown", event => {
+      if (
+        event.key === "Escape" &&
+        successModal.classList.contains("visible")
+      ) {
+        fecharConfirmacaoSucesso();
+      }
+    });
 
     function updateIndex() {
       const active = Number(activeField.value);
@@ -836,6 +1009,9 @@
         if (GOOGLE_APPS_SCRIPT_URL && result.ok) {
           form.reset();
           indexElement.textContent = "0,0%";
+          abrirConfirmacaoSucesso(
+            "As informações foram registradas com sucesso na base de dados."
+          );
         }
       } catch (error) {
         console.error(error);
