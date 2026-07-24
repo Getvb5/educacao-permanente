@@ -238,6 +238,60 @@
       font-size:13px;
       font-weight:700;
     }
+    .indicador-detalhado {
+      margin-bottom:14px;
+      padding:20px;
+      border-left:6px solid var(--amarelo-recife);
+    }
+    .indicador-detalhado[hidden] { display:none; }
+    .indicador-topo {
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:16px;
+      margin-bottom:16px;
+    }
+    .indicador-topo h2 {
+      margin:0 0 6px;
+      color:var(--azul-recife-escuro);
+      font-size:18px;
+    }
+    .indicador-topo p {
+      margin:0;
+      color:var(--suave);
+      font-size:13px;
+      line-height:1.45;
+    }
+    .selo-indicador {
+      display:inline-flex;
+      align-items:center;
+      padding:6px 10px;
+      border-radius:999px;
+      background:var(--azul-recife-claro);
+      color:var(--azul-recife-escuro);
+      font-size:11px;
+      font-weight:800;
+      text-transform:uppercase;
+      white-space:nowrap;
+    }
+    .cards-detalhe {
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:12px;
+    }
+    .card-detalhe {
+      padding:16px;
+      border:1px solid var(--borda);
+      border-radius:12px;
+      background:#F8FBFE;
+    }
+    .card-detalhe .valor {
+      font-size:30px;
+    }
+    @media(max-width:760px) {
+      .cards-detalhe { grid-template-columns:1fr; }
+      .indicador-topo { flex-direction:column; }
+    }
     .bom { color:var(--verde); font-weight:800; }
     .atencao { color:var(--amarelo-alerta); font-weight:800; }
     .baixo { color:var(--vermelho); font-weight:800; }
@@ -346,40 +400,75 @@
     <div id="conteudo" hidden>
       <section id="recorteAtivo" class="recorte-ativo" aria-live="polite"></section>
 
-      <section class="cards">
+      <section class="cards" aria-label="Indicadores da visão geral">
         <article class="painel card">
-          <div class="rotulo">Média mensal de profissionais ativos</div>
-          <div id="ativos" class="valor">0</div>
-          <div id="formulaAtivos" class="detalhe">Média do quadro ativo nos períodos selecionados</div>
+          <div class="rotulo">Registros de monitoramento</div>
+          <div id="totalRegistros" class="valor">0</div>
+          <div class="detalhe">Quantidade de registros enviados pelas unidades</div>
         </article>
+
         <article class="painel card">
-          <div class="rotulo">Profissionais treinados</div>
-          <div id="treinados" class="valor">0</div>
-          <div class="detalhe">Soma dos treinamentos registrados no período</div>
+          <div class="rotulo">Participações registradas</div>
+          <div id="totalParticipacoes" class="valor">0</div>
+          <div class="detalhe">Soma dos profissionais treinados informados nos registros</div>
         </article>
-        <article class="painel card">
-          <div class="rotulo">Índice de Atividade da Educação Permanente</div>
-          <div id="indice" class="valor">0%</div>
-          <div id="formulaIndice" class="detalhe">Profissionais treinados ÷ média mensal de profissionais ativos</div>
-        </article>
+
         <article class="painel card">
           <div class="rotulo">Unidades com registro</div>
           <div id="qtdUnidades" class="valor">0</div>
-          <div id="qtdRegistros" class="detalhe">0 registro(s) em 0 período(s)</div>
+          <div class="detalhe">Unidades distintas presentes no recorte</div>
         </article>
+
+        <article class="painel card">
+          <div class="rotulo">Períodos monitorados</div>
+          <div id="qtdPeriodos" class="valor">0</div>
+          <div class="detalhe">Combinações distintas de ano e mês</div>
+        </article>
+      </section>
+
+      <section id="indicadorDetalhado" class="painel indicador-detalhado" hidden>
+        <div class="indicador-topo">
+          <div>
+            <h2>Índice de Atividade da Educação Permanente</h2>
+            <p id="descricaoIndicador">Selecione exatamente um ano, um mês e uma unidade.</p>
+          </div>
+          <span class="selo-indicador">Indicador mensal detalhado</span>
+        </div>
+
+        <div class="cards-detalhe">
+          <article class="card-detalhe">
+            <div class="rotulo">Profissionais ativos</div>
+            <div id="ativosDetalhe" class="valor">0</div>
+            <div class="detalhe">Quadro ativo informado para o recorte</div>
+          </article>
+
+          <article class="card-detalhe">
+            <div class="rotulo">Profissionais treinados</div>
+            <div id="treinadosDetalhe" class="valor">0</div>
+            <div class="detalhe">Participações registradas no recorte</div>
+          </article>
+
+          <article class="card-detalhe">
+            <div class="rotulo">Índice de atividade</div>
+            <div id="indiceDetalhe" class="valor">0%</div>
+            <div id="formulaIndicador" class="detalhe">Treinados ÷ ativos</div>
+          </article>
+        </div>
       </section>
 
       <section class="graficos">
         <article class="painel grafico">
-          <h2>Índice de participação por unidade</h2>
+          <h2>Registros por unidade</h2>
           <div class="canvas"><canvas id="graficoUnidades"></canvas></div>
         </article>
+
         <article class="painel grafico">
-          <h2>Capacitações por mês</h2>
+          <h2>Participações por mês</h2>
           <div class="canvas"><canvas id="graficoMeses"></canvas></div>
         </article>
+
         <article class="painel grafico">
-          <h2>Profissionais treinados por unidade</h2>
+          <h2>Participações por unidade</h2>
           <div class="canvas"><canvas id="graficoTreinados"></canvas></div>
         </article>
       </section>
@@ -388,12 +477,12 @@
         <div class="tabela-topo">
           <div>
             <h2>Registros detalhados</h2>
-            <p id="resumoTabela">0 registros encontrados.</p>
+            <p id="resumoTabela">0 registro(s).</p>
           </div>
           <button id="exportar" class="secundario">Exportar CSV</button>
         </div>
 
-        <div class="tabela-wrap">
+        <div class="rolagem">
           <table>
             <thead>
               <tr>
@@ -402,7 +491,6 @@
                 <th>Unidade</th>
                 <th>Ativos</th>
                 <th>Treinados</th>
-                <th>Índice</th>
                 <th>Responsável</th>
                 <th>Lista de presença</th>
                 <th>Observações</th>
@@ -476,7 +564,7 @@
         }));
 
         preencherFiltros();
-        mostrarOrientacaoInicial();
+        aplicarFiltros();
       } catch (erro) {
         $("estado").textContent = "Erro ao carregar os dados: " + erro.message + ". Confirme a implantação mais recente do Google Apps Script.";
       }
@@ -519,29 +607,23 @@
       };
     }
 
-    function filtrosObrigatoriosPreenchidos() {
+    function possuiRecorteExato() {
       const filtros = filtrosSelecionados();
-      return Boolean(
-        filtros.anos.length &&
-        filtros.meses.length &&
-        filtros.unidades.length
+      return (
+        filtros.anos.length === 1 &&
+        filtros.meses.length === 1 &&
+        filtros.unidades.length === 1
       );
     }
 
-    function mostrarOrientacaoInicial() {
-      destruirGraficos();
-      filtrados = [];
-      $("conteudo").hidden = true;
-      $("estado").hidden = false;
-      $("estado").innerHTML = `
-        <div class="estado-icone" aria-hidden="true">⌕</div>
-        <div class="estado-titulo">Selecione um filtro para visualizar os resultados</div>
-        <p class="estado-texto">
-          Os indicadores, gráficos e registros detalhados somente serão exibidos
-          após a seleção de pelo menos um recorte por <strong>ano</strong>,
-          <strong>mês</strong> ou <strong>unidade</strong>.
-        </p>
-      `;
+    function dadosDoRecorte() {
+      const {anos, meses, unidades} = filtrosSelecionados();
+
+      return base.filter(dado =>
+        (!anos.length || anos.includes(dado.anoReferencia)) &&
+        (!meses.length || meses.includes(dado.mesReferencia)) &&
+        (!unidades.length || unidades.includes(dado.unidade))
+      );
     }
 
     function mostrarSemResultados() {
@@ -552,8 +634,8 @@
         <div class="estado-icone" aria-hidden="true">!</div>
         <div class="estado-titulo">Nenhum registro encontrado</div>
         <p class="estado-texto">
-          Não há dados para a combinação de filtros selecionada.
-          Ajuste o ano, o mês ou a unidade e tente novamente.
+          Não há dados para a combinação selecionada.
+          Revise os anos, meses ou unidades e tente novamente.
         </p>
       `;
     }
@@ -562,27 +644,30 @@
       const filtros = filtrosSelecionados();
       const partes = [];
 
-      if (filtros.anos.length) partes.push("Anos: " + filtros.anos.join(", "));
-      if (filtros.meses.length) partes.push("Meses: " + filtros.meses.join(", "));
-      if (filtros.unidades.length) partes.push("Unidades: " + filtros.unidades.join(", "));
+      partes.push(
+        filtros.anos.length
+          ? "Anos: " + filtros.anos.join(", ")
+          : "Todos os anos"
+      );
+
+      partes.push(
+        filtros.meses.length
+          ? "Meses: " + filtros.meses.join(", ")
+          : "Todos os meses"
+      );
+
+      partes.push(
+        filtros.unidades.length
+          ? "Unidades: " + filtros.unidades.join(", ")
+          : "Todas as unidades"
+      );
 
       $("recorteAtivo").textContent =
-        "Recorte aplicado — " + partes.join("  •  ");
+        "Visão apresentada — " + partes.join("  •  ");
     }
 
     function aplicarFiltros() {
-      const {anos, meses, unidades} = filtrosSelecionados();
-
-      if (!filtrosObrigatoriosPreenchidos()) {
-        mostrarOrientacaoInicial();
-        return;
-      }
-
-      filtrados = base.filter(d =>
-        anos.includes(d.anoReferencia) &&
-        meses.includes(d.mesReferencia) &&
-        unidades.includes(d.unidade)
-      );
+      filtrados = dadosDoRecorte();
 
       if (!filtrados.length) {
         mostrarSemResultados();
@@ -593,7 +678,8 @@
       $("conteudo").hidden = false;
 
       atualizarDescricaoRecorte();
-      atualizarCards();
+      atualizarCardsGerais();
+      atualizarIndicadorDetalhado();
       atualizarTabela();
       atualizarGraficos();
     }
@@ -690,162 +776,291 @@
       };
     }
 
-    function atualizarCards() {
+    function atualizarCardsGerais() {
+      const totalRegistros = filtrados.length;
+      const totalParticipacoes = filtrados.reduce(
+        (soma, dado) => soma + (Number(dado.profissionaisTreinados) || 0),
+        0
+      );
+
+      const unidades = new Set(
+        filtrados.map(dado => dado.unidade).filter(Boolean)
+      );
+
+      const periodos = new Set(
+        filtrados.map(dado => chavePeriodo(dado))
+      );
+
+      $("totalRegistros").textContent = numero(totalRegistros);
+      $("totalParticipacoes").textContent = numero(totalParticipacoes);
+      $("qtdUnidades").textContent = numero(unidades.size);
+      $("qtdPeriodos").textContent = numero(periodos.size);
+    }
+
+    function atualizarIndicadorDetalhado() {
+      const painel = $("indicadorDetalhado");
+
+      if (!possuiRecorteExato()) {
+        painel.hidden = true;
+        return;
+      }
+
+      const filtros = filtrosSelecionados();
       const resumo = calcularResumo(filtrados);
 
-      $("ativos").textContent = numero(resumo.mediaMensalAtivos);
-      $("treinados").textContent = numero(resumo.totalTreinados);
-      $("indice").textContent = percentual(resumo.indiceGeral);
+      $("ativosDetalhe").textContent = numero(resumo.mediaMensalAtivos);
+      $("treinadosDetalhe").textContent = numero(resumo.totalTreinados);
+      $("indiceDetalhe").textContent = percentual(resumo.indiceGeral);
 
-      $("formulaAtivos").textContent =
-        numero(resumo.somaAtivosPeriodos) +
-        " ativos somados ÷ " +
-        numero(resumo.quantidadePeriodos) +
-        " período(s)";
-
-      $("formulaIndice").textContent =
+      $("formulaIndicador").textContent =
         numero(resumo.totalTreinados) +
         " treinados ÷ " +
         numero(resumo.mediaMensalAtivos) +
         " profissionais ativos";
 
-      $("qtdUnidades").textContent = numero(resumo.quantidadeUnidades);
-      $("qtdRegistros").textContent =
-        numero(resumo.quantidadeRegistros) +
-        " registro(s) em " +
-        numero(resumo.quantidadePeriodos) +
-        " período(s)";
+      $("descricaoIndicador").textContent =
+        filtros.unidades[0] +
+        " • " +
+        filtros.meses[0] +
+        " de " +
+        filtros.anos[0];
+
+      painel.hidden = false;
     }
 
     function atualizarTabela() {
       const registros = [...filtrados].reverse();
-      $("resumoTabela").textContent = numero(registros.length) + " registro(s) encontrado(s).";
+      $("resumoTabela").textContent =
+        numero(registros.length) + " registro(s) encontrado(s).";
 
-      $("corpo").innerHTML = registros.map(d => {
-        const classe = d.indiceParticipacao >= .8 ? "bom" : d.indiceParticipacao >= .6 ? "atencao" : "baixo";
-        const linkLista = d.linkListaPresenca
-          ? `<a class="link" href="${escapar(d.linkListaPresenca)}" target="_blank" rel="noopener noreferrer">Abrir lista</a>`
+      $("corpo").innerHTML = registros.map(dado => {
+        const linkLista = dado.linkListaPresenca
+          ? `<a class="link" href="${escapar(dado.linkListaPresenca)}" target="_blank" rel="noopener noreferrer">Abrir lista</a>`
           : "—";
 
         return `<tr>
-          <td>${escapar(d.anoReferencia)}</td>
-          <td>${escapar(d.mesReferencia)}</td>
-          <td>${escapar(d.unidade)}</td>
-          <td>${numero(d.profissionaisAtivos)}</td>
-          <td>${numero(d.profissionaisTreinados)}</td>
-          <td class="${classe}">${percentual(d.indiceParticipacao)}</td>
-          <td>${escapar(d.responsavel)}${d.email ? `<br><small>${escapar(d.email)}</small>` : ""}</td>
+          <td>${escapar(dado.anoReferencia)}</td>
+          <td>${escapar(dado.mesReferencia)}</td>
+          <td>${escapar(dado.unidade)}</td>
+          <td>${numero(dado.profissionaisAtivos)}</td>
+          <td>${numero(dado.profissionaisTreinados)}</td>
+          <td>${escapar(dado.responsavel)}${dado.email ? `<br><small>${escapar(dado.email)}</small>` : ""}</td>
           <td>${linkLista}</td>
-          <td>${escapar(d.observacoes || "—")}</td>
+          <td>${escapar(dado.observacoes || "—")}</td>
         </tr>`;
-      }).join("") || '<tr><td colspan="9">Nenhum registro encontrado para os filtros selecionados.</td></tr>';
-    }
-
-    function resumirPorUnidade(dados) {
-      const grupos = new Map();
-
-      dados.forEach(dado => {
-        const unidade = dado.unidade || "Não informado";
-
-        if (!grupos.has(unidade)) {
-          grupos.set(unidade, []);
-        }
-
-        grupos.get(unidade).push(dado);
-      });
-
-      return [...grupos.entries()].map(([nome, registros]) => {
-        const resumo = calcularResumo(registros);
-
-        return {
-          nome,
-          indice: resumo.indiceGeral * 100,
-          treinados: resumo.totalTreinados
-        };
-      });
+      }).join("") ||
+        '<tr><td colspan="8">Nenhum registro encontrado para os filtros selecionados.</td></tr>';
     }
 
     function contarPor(campo) {
-      return filtrados.reduce((r,d)=>{
-        const chave = d[campo] || "Não informado";
-        r[chave] = (r[chave] || 0) + 1;
-        return r;
-      },{});
+      return filtrados.reduce((resultado, dado) => {
+        const chave = dado[campo] || "Não informado";
+        resultado[chave] = (resultado[chave] || 0) + 1;
+        return resultado;
+      }, {});
     }
 
     function somarTreinadosPor(campo) {
-      return filtrados.reduce((r,d)=>{
-        const chave = d[campo] || "Não informado";
-        r[chave] = (r[chave] || 0) + d.profissionaisTreinados;
-        return r;
-      },{});
+      return filtrados.reduce((resultado, dado) => {
+        const chave = dado[campo] || "Não informado";
+        resultado[chave] =
+          (resultado[chave] || 0) +
+          (Number(dado.profissionaisTreinados) || 0);
+        return resultado;
+      }, {});
+    }
+
+    function agruparParticipacoesPorPeriodo() {
+      const grupos = new Map();
+
+      filtrados.forEach(dado => {
+        const ano = dado.anoReferencia || "Sem ano";
+        const mes = dado.mesReferencia || "Sem mês";
+        const chave = `${ano}|${normalizarMes(mes)}`;
+
+        if (!grupos.has(chave)) {
+          grupos.set(chave, {
+            ano,
+            mes,
+            total: 0
+          });
+        }
+
+        grupos.get(chave).total +=
+          Number(dado.profissionaisTreinados) || 0;
+      });
+
+      return [...grupos.values()].sort((a, b) => {
+        const diferencaAno = Number(a.ano) - Number(b.ano);
+        if (diferencaAno !== 0) return diferencaAno;
+        return ordenarMeses(a.mes, b.mes);
+      });
     }
 
     function destruirGraficos() {
-      if (chartUnidades) chartUnidades.destroy();
-      if (chartMeses) chartMeses.destroy();
-      if (chartTreinados) chartTreinados.destroy();
+      if (chartUnidades) {
+        chartUnidades.destroy();
+        chartUnidades = null;
+      }
+      if (chartMeses) {
+        chartMeses.destroy();
+        chartMeses = null;
+      }
+      if (chartTreinados) {
+        chartTreinados.destroy();
+        chartTreinados = null;
+      }
     }
 
     function atualizarGraficos() {
       destruirGraficos();
 
-      const unidades = resumirPorUnidade(filtrados)
-        .sort((a,b)=>b.indice-a.indice)
-        .slice(0,15);
+      const registrosPorUnidade = Object.entries(contarPor("unidade"))
+        .map(([nome, total]) => ({nome, total}))
+        .sort((a, b) => b.total - a.total)
+        .slice(0, 15);
 
-      const meses = Object.entries(contarPor("mesReferencia"))
-        .map(([nome,total])=>({nome,total}))
-        .sort((a,b)=>ordenarMeses(a.nome,b.nome));
+      const participacoesPorPeriodo = agruparParticipacoesPorPeriodo();
 
-      const treinadosPorUnidade = Object.entries(somarTreinadosPor("unidade"))
-        .map(([nome,total])=>({nome,total}))
-        .sort((a,b)=>b.total-a.total)
-        .slice(0,15);
+      const treinadosPorUnidade = Object.entries(
+        somarTreinadosPor("unidade")
+      )
+        .map(([nome, total]) => ({nome, total}))
+        .sort((a, b) => b.total - a.total)
+        .slice(0, 15);
 
-      chartUnidades = new Chart($("graficoUnidades"),{
-        type:"bar",
-        data:{labels:unidades.map(x=>x.nome),datasets:[{data:unidades.map(x=>x.indice),backgroundColor:"rgba(0,92,169,.82)",borderColor:"#F2E600",borderWidth:1,borderRadius:6}]},
-        options:{indexAxis:"y",responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,ticks:{callback:v=>v+"%"}}}}
+      chartUnidades = new Chart($("graficoUnidades"), {
+        type: "bar",
+        data: {
+          labels: registrosPorUnidade.map(item => item.nome),
+          datasets: [{
+            data: registrosPorUnidade.map(item => item.total),
+            backgroundColor: "rgba(0,92,169,.82)",
+            borderColor: "#F2E600",
+            borderWidth: 1,
+            borderRadius: 6
+          }]
+        },
+        options: {
+          indexAxis: "y",
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {legend: {display: false}},
+          scales: {
+            x: {
+              beginAtZero: true,
+              ticks: {precision: 0}
+            }
+          }
+        }
       });
 
-      chartMeses = new Chart($("graficoMeses"),{
-        type:"line",
-        data:{labels:meses.map(x=>x.nome),datasets:[{data:meses.map(x=>x.total),borderColor:"#005CA9",backgroundColor:"rgba(0,92,169,.10)",pointBackgroundColor:"#F2E600",pointBorderColor:"#003F73",pointBorderWidth:2,pointRadius:5,fill:true,tension:.3}]},
-        options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{precision:0}}}}
+      chartMeses = new Chart($("graficoMeses"), {
+        type: "line",
+        data: {
+          labels: participacoesPorPeriodo.map(
+            item => `${item.mes.substring(0, 3)}/${item.ano}`
+          ),
+          datasets: [{
+            data: participacoesPorPeriodo.map(item => item.total),
+            borderColor: "#005CA9",
+            backgroundColor: "rgba(0,92,169,.10)",
+            pointBackgroundColor: "#F2E600",
+            pointBorderColor: "#003F73",
+            pointBorderWidth: 2,
+            pointRadius: 5,
+            fill: true,
+            tension: .3
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {legend: {display: false}},
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {precision: 0}
+            }
+          }
+        }
       });
 
-      chartTreinados = new Chart($("graficoTreinados"),{
-        type:"bar",
-        data:{labels:treinadosPorUnidade.map(x=>x.nome),datasets:[{data:treinadosPorUnidade.map(x=>x.total),backgroundColor:"rgba(0,63,115,.78)",borderColor:"#F2E600",borderWidth:1,borderRadius:6}]},
-        options:{indexAxis:"y",responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,ticks:{precision:0}}}}
+      chartTreinados = new Chart($("graficoTreinados"), {
+        type: "bar",
+        data: {
+          labels: treinadosPorUnidade.map(item => item.nome),
+          datasets: [{
+            data: treinadosPorUnidade.map(item => item.total),
+            backgroundColor: "rgba(0,63,115,.78)",
+            borderColor: "#F2E600",
+            borderWidth: 1,
+            borderRadius: 6
+          }]
+        },
+        options: {
+          indexAxis: "y",
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {legend: {display: false}},
+          scales: {
+            x: {
+              beginAtZero: true,
+              ticks: {precision: 0}
+            }
+          }
+        }
       });
     }
 
     function exportarCsv() {
-      if (!existeFiltroAtivo() || !filtrados.length) {
-        alert("Selecione pelo menos um filtro antes de exportar os dados.");
+      if (!filtrados.length) {
+        alert("Não há dados disponíveis para exportação.");
         return;
       }
 
       const linhas = [[
-        "ANO_REFERENCIA","MES_REFERENCIA","UNIDADE_SAUDE",
-        "RESPONSAVEL","EMAIL","PROFISSIONAIS_ATIVOS","PROFISSIONAIS_TREINADOS",
-        "INDICE_PARTICIPACAO","LINK_LISTA_PRESENCA","OBSERVACOES"
-      ],...filtrados.map(d=>[
-        d.anoReferencia,d.mesReferencia,d.unidade,d.responsavel,d.email,
-        d.profissionaisAtivos,d.profissionaisTreinados,
-        (d.indiceParticipacao*100).toFixed(1).replace(".",",")+"%",
-        d.linkListaPresenca,d.observacoes
+        "ANO_REFERENCIA",
+        "MES_REFERENCIA",
+        "UNIDADE_SAUDE",
+        "RESPONSAVEL",
+        "EMAIL",
+        "PROFISSIONAIS_ATIVOS",
+        "PROFISSIONAIS_TREINADOS",
+        "LINK_LISTA_PRESENCA",
+        "OBSERVACOES"
+      ], ...filtrados.map(dado => [
+        dado.anoReferencia,
+        dado.mesReferencia,
+        dado.unidade,
+        dado.responsavel,
+        dado.email,
+        dado.profissionaisAtivos,
+        dado.profissionaisTreinados,
+        dado.linkListaPresenca,
+        dado.observacoes
       ])];
 
-      const csv = linhas.map(l=>l.map(v=>`"${String(v ?? "").replaceAll('"','""')}"`).join(";")).join("\n");
-      const blob = new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8"});
+      const csv = linhas
+        .map(linha =>
+          linha
+            .map(valor =>
+              `"${String(valor ?? "").replaceAll('"', '""')}"`
+            )
+            .join(";")
+        )
+        .join("\n");
+
+      const blob = new Blob(
+        ["\uFEFF" + csv],
+        {type: "text/csv;charset=utf-8"}
+      );
+
       const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "dashboard_educacao_permanente.csv";
-      a.click();
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "dashboard_educacao_permanente.csv";
+      link.click();
       URL.revokeObjectURL(url);
     }
 
@@ -863,7 +1078,7 @@
       ["ano","mes","unidade"].forEach(id => {
         [...$(id).options].forEach(option => option.selected = false);
       });
-      mostrarOrientacaoInicial();
+      aplicarFiltros();
     });
     $("atualizar").addEventListener("click",carregar);
     $("exportar").addEventListener("click",exportarCsv);
