@@ -542,7 +542,18 @@
       $("conteudo").hidden = true;
 
       try {
-        const resposta = await fetch(URL_API + "&t=" + Date.now(), {cache:"no-store"});
+        const controlador = new AbortController();
+        const limite = setTimeout(() => controlador.abort(), 25000);
+
+        const resposta = await fetch(
+          URL_API + "&t=" + Date.now(),
+          {
+            cache: "no-store",
+            signal: controlador.signal
+          }
+        );
+
+        clearTimeout(limite);
         if (!resposta.ok) throw new Error("Falha HTTP " + resposta.status);
 
         const retorno = await resposta.json();
@@ -570,17 +581,19 @@
       }
     }
 
-    function preencherSelect(id,valores,textoInicial) {
+    function preencherSelect(id, valores, textoInicial) {
       const select = $(id);
-      const selecionadosAtuais = [...select.selectedOptions].map(option => option.value);
+      const valorAtual = select.value;
 
-      select.innerHTML = valores
-        .map(valor => `<option value="${escapar(valor)}">${escapar(valor)}</option>`)
-        .join("");
+      select.innerHTML =
+        `<option value="">${textoInicial}</option>` +
+        valores
+          .map(valor =>
+            `<option value="${escapar(valor)}">${escapar(valor)}</option>`
+          )
+          .join("");
 
-      [...select.options].forEach(option => {
-        option.selected = selecionadosAtuais.includes(option.value);
-      });
+      select.value = valores.includes(valorAtual) ? valorAtual : "";
     }
 
     function preencherFiltros() {
@@ -588,15 +601,14 @@
       const meses = [...new Set(base.map(d=>d.mesReferencia).filter(Boolean))].sort(ordenarMeses);
       const unidades = [...new Set(base.map(d=>d.unidade).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"pt-BR"));
 
-      preencherSelect("ano",anos,"Selecione os anos");
-      preencherSelect("mes",meses,"Selecione os meses");
-      preencherSelect("unidade",unidades,"Selecione as unidades");
+      preencherSelect("ano", anos, "Selecione um ano");
+      preencherSelect("mes", meses, "Selecione um mês");
+      preencherSelect("unidade", unidades, "Selecione uma unidade");
     }
 
     function valoresSelecionados(id) {
-      return [...$(id).selectedOptions]
-        .map(option => option.value)
-        .filter(Boolean);
+      const valor = $(id).value;
+      return valor ? [valor] : [];
     }
 
     function filtrosSelecionados() {
@@ -1081,19 +1093,11 @@
 
     ["ano","mes","unidade"].forEach(id=>$(id).addEventListener("change",aplicarFiltros));
     function limparFiltros() {
-      ["ano", "mes", "unidade"].forEach(id => {
-        const select = $(id);
+      $("ano").value = "";
+      $("mes").value = "";
+      $("unidade").value = "";
 
-        // Os filtros permitem múltipla seleção; por isso,
-        // cada opção precisa ser desmarcada individualmente.
-        [...select.options].forEach(option => {
-          option.selected = false;
-        });
-
-        select.selectedIndex = -1;
-      });
-
-      // Sem nenhuma seleção, a visão geral completa é reapresentada.
+      // Sem filtros selecionados, o dashboard reapresenta a visão geral.
       aplicarFiltros();
     }
 
@@ -1101,9 +1105,7 @@
       evento.preventDefault();
       limparFiltros();
     });
-      aplicarFiltros();
-    });
-    $("atualizar").addEventListener("click",carregar);
+    $("atualizar").addEventListener("click", carregar);
     $("exportar").addEventListener("click",exportarCsv);
 
     carregar();
