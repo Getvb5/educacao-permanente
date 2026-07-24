@@ -194,7 +194,50 @@
     th,td { padding:12px 14px; text-align:left; border-bottom:1px solid var(--borda); font-size:13px; vertical-align:top; }
     th { background:var(--azul-recife); color:white; font-size:12px; text-transform:uppercase; }
     tr:hover td { background:#F5FAFE; }
-    .estado { padding:45px; text-align:center; color:var(--suave); }
+    .estado {
+      padding:38px 28px;
+      text-align:center;
+      color:var(--suave);
+    }
+    .estado-icone {
+      width:54px;
+      height:54px;
+      display:grid;
+      place-items:center;
+      margin:0 auto 14px;
+      border-radius:50%;
+      background:var(--azul-recife-claro);
+      color:var(--azul-recife);
+      font-size:25px;
+      font-weight:900;
+    }
+    .estado-titulo {
+      margin:0 0 8px;
+      color:var(--azul-recife-escuro);
+      font-size:19px;
+      font-weight:800;
+    }
+    .estado-texto {
+      max-width:680px;
+      margin:auto;
+      line-height:1.55;
+    }
+    .recorte-ativo {
+      display:flex;
+      align-items:center;
+      gap:8px;
+      min-height:44px;
+      margin-bottom:14px;
+      padding:10px 14px;
+      border:1px solid rgba(242,230,0,.72);
+      border-left:5px solid var(--amarelo-recife);
+      border-radius:12px;
+      background:rgba(255,255,255,.97);
+      color:var(--azul-recife-escuro);
+      box-shadow:0 8px 20px rgba(0,28,56,.14);
+      font-size:13px;
+      font-weight:700;
+    }
     .bom { color:var(--verde); font-weight:800; }
     .atencao { color:var(--amarelo-alerta); font-weight:800; }
     .baixo { color:var(--vermelho); font-weight:800; }
@@ -285,15 +328,15 @@
     <section class="painel filtros">
       <div>
         <label for="ano">Ano de referência</label>
-        <select id="ano"><option value="">Todos os anos</option></select>
+        <select id="ano"><option value="">Selecione um ano</option></select>
       </div>
       <div>
         <label for="mes">Mês de referência</label>
-        <select id="mes"><option value="">Todos os meses</option></select>
+        <select id="mes"><option value="">Selecione um mês</option></select>
       </div>
       <div>
         <label for="unidade">Unidade de saúde</label>
-        <select id="unidade"><option value="">Todas as unidades</option></select>
+        <select id="unidade"><option value="">Selecione uma unidade</option></select>
       </div>
       <button id="limpar" class="secundario">Limpar filtros</button>
     </section>
@@ -301,11 +344,13 @@
     <section id="estado" class="painel estado">Carregando dados...</section>
 
     <div id="conteudo" hidden>
+      <section id="recorteAtivo" class="recorte-ativo" aria-live="polite"></section>
+
       <section class="cards">
         <article class="painel card">
           <div class="rotulo">Média mensal de profissionais ativos</div>
           <div id="ativos" class="valor">0</div>
-          <div class="detalhe">Média do quadro ativo nos períodos selecionados</div>
+          <div id="formulaAtivos" class="detalhe">Média do quadro ativo nos períodos selecionados</div>
         </article>
         <article class="painel card">
           <div class="rotulo">Profissionais treinados</div>
@@ -313,9 +358,9 @@
           <div class="detalhe">Soma dos treinamentos registrados no período</div>
         </article>
         <article class="painel card">
-          <div class="rotulo">Índice geral</div>
+          <div class="rotulo">Índice de Atividade da Educação Permanente</div>
           <div id="indice" class="valor">0%</div>
-          <div class="detalhe">Treinados no período ÷ média mensal de ativos</div>
+          <div id="formulaIndice" class="detalhe">Profissionais treinados ÷ média mensal de profissionais ativos</div>
         </article>
         <article class="painel card">
           <div class="rotulo">Unidades com registro</div>
@@ -431,9 +476,7 @@
         }));
 
         preencherFiltros();
-        aplicarFiltros();
-        $("estado").hidden = true;
-        $("conteudo").hidden = false;
+        mostrarOrientacaoInicial();
       } catch (erro) {
         $("estado").textContent = "Erro ao carregar os dados: " + erro.message + ". Confirme a implantação mais recente do Google Apps Script.";
       }
@@ -451,15 +494,73 @@
       const meses = [...new Set(base.map(d=>d.mesReferencia).filter(Boolean))].sort(ordenarMeses);
       const unidades = [...new Set(base.map(d=>d.unidade).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"pt-BR"));
 
-      preencherSelect("ano",anos,"Todos os anos");
-      preencherSelect("mes",meses,"Todos os meses");
-      preencherSelect("unidade",unidades,"Todas as unidades");
+      preencherSelect("ano",anos,"Selecione um ano");
+      preencherSelect("mes",meses,"Selecione um mês");
+      preencherSelect("unidade",unidades,"Selecione uma unidade");
+    }
+
+    function filtrosSelecionados() {
+      return {
+        ano: $("ano").value,
+        mes: $("mes").value,
+        unidade: $("unidade").value
+      };
+    }
+
+    function existeFiltroAtivo() {
+      const filtros = filtrosSelecionados();
+      return Boolean(filtros.ano || filtros.mes || filtros.unidade);
+    }
+
+    function mostrarOrientacaoInicial() {
+      destruirGraficos();
+      filtrados = [];
+      $("conteudo").hidden = true;
+      $("estado").hidden = false;
+      $("estado").innerHTML = `
+        <div class="estado-icone" aria-hidden="true">⌕</div>
+        <div class="estado-titulo">Selecione um filtro para visualizar os resultados</div>
+        <p class="estado-texto">
+          Os indicadores, gráficos e registros detalhados somente serão exibidos
+          após a seleção de pelo menos um recorte por <strong>ano</strong>,
+          <strong>mês</strong> ou <strong>unidade</strong>.
+        </p>
+      `;
+    }
+
+    function mostrarSemResultados() {
+      destruirGraficos();
+      $("conteudo").hidden = true;
+      $("estado").hidden = false;
+      $("estado").innerHTML = `
+        <div class="estado-icone" aria-hidden="true">!</div>
+        <div class="estado-titulo">Nenhum registro encontrado</div>
+        <p class="estado-texto">
+          Não há dados para a combinação de filtros selecionada.
+          Ajuste o ano, o mês ou a unidade e tente novamente.
+        </p>
+      `;
+    }
+
+    function atualizarDescricaoRecorte() {
+      const filtros = filtrosSelecionados();
+      const partes = [];
+
+      if (filtros.ano) partes.push("Ano: " + filtros.ano);
+      if (filtros.mes) partes.push("Mês: " + filtros.mes);
+      if (filtros.unidade) partes.push("Unidade: " + filtros.unidade);
+
+      $("recorteAtivo").textContent =
+        "Recorte aplicado — " + partes.join("  •  ");
     }
 
     function aplicarFiltros() {
-      const ano = $("ano").value;
-      const mes = $("mes").value;
-      const unidade = $("unidade").value;
+      const {ano, mes, unidade} = filtrosSelecionados();
+
+      if (!existeFiltroAtivo()) {
+        mostrarOrientacaoInicial();
+        return;
+      }
 
       filtrados = base.filter(d =>
         (!ano || d.anoReferencia === ano) &&
@@ -467,6 +568,15 @@
         (!unidade || d.unidade === unidade)
       );
 
+      if (!filtrados.length) {
+        mostrarSemResultados();
+        return;
+      }
+
+      $("estado").hidden = true;
+      $("conteudo").hidden = false;
+
+      atualizarDescricaoRecorte();
       atualizarCards();
       atualizarTabela();
       atualizarGraficos();
@@ -482,8 +592,11 @@
        * 1. Para cada unidade e período, calcula a média dos ativos informados.
        *    Isso impede que registros duplicados do mesmo mês multipliquem o quadro.
        * 2. Soma os ativos médios das unidades em cada período.
-       * 3. Calcula a média mensal desses totais.
-       * 4. Índice geral = total treinados no período / média mensal de ativos.
+       * 3. Calcula a média mensal dos profissionais ativos.
+       * 4. Índice de Atividade da Educação Permanente =
+       *    total de profissionais treinados / média mensal de profissionais ativos.
+       *
+       * Esta é a regra institucional definida para o indicador.
        */
       const unidadePeriodo = new Map();
 
@@ -549,6 +662,7 @@
       return {
         mediaMensalAtivos,
         totalTreinados,
+        somaAtivosPeriodos: somaAtivosMensais,
         indiceGeral: mediaMensalAtivos
           ? totalTreinados / mediaMensalAtivos
           : 0,
@@ -566,6 +680,19 @@
       $("ativos").textContent = numero(resumo.mediaMensalAtivos);
       $("treinados").textContent = numero(resumo.totalTreinados);
       $("indice").textContent = percentual(resumo.indiceGeral);
+
+      $("formulaAtivos").textContent =
+        numero(resumo.somaAtivosPeriodos) +
+        " ativos somados ÷ " +
+        numero(resumo.quantidadePeriodos) +
+        " período(s)";
+
+      $("formulaIndice").textContent =
+        numero(resumo.totalTreinados) +
+        " treinados ÷ " +
+        numero(resumo.mediaMensalAtivos) +
+        " profissionais ativos";
+
       $("qtdUnidades").textContent = numero(resumo.quantidadeUnidades);
       $("qtdRegistros").textContent =
         numero(resumo.quantidadeRegistros) +
@@ -680,6 +807,11 @@
     }
 
     function exportarCsv() {
+      if (!existeFiltroAtivo() || !filtrados.length) {
+        alert("Selecione pelo menos um filtro antes de exportar os dados.");
+        return;
+      }
+
       const linhas = [[
         "ANO_REFERENCIA","MES_REFERENCIA","UNIDADE_SAUDE",
         "RESPONSAVEL","EMAIL","PROFISSIONAIS_ATIVOS","PROFISSIONAIS_TREINADOS",
@@ -715,7 +847,7 @@
       $("ano").value="";
       $("mes").value="";
       $("unidade").value="";
-      aplicarFiltros();
+      mostrarOrientacaoInicial();
     });
     $("atualizar").addEventListener("click",carregar);
     $("exportar").addEventListener("click",exportarCsv);
