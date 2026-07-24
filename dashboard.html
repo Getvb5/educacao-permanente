@@ -479,7 +479,7 @@
           <div class="rotulo">Índice de Educação Permanente</div>
           <div id="indiceEducacaoPermanente" class="valor">0%</div>
           <div id="formulaIndiceGeral" class="detalhe">
-            Profissionais treinados ÷ profissionais ativos × 100
+            Média mensal de treinados ÷ média mensal de ativos × 100
           </div>
           <div id="statusIndice" class="status-indice status-insatisfatorio">
             <span class="status-dot" aria-hidden="true"></span>
@@ -569,6 +569,10 @@
 
     const $ = id => document.getElementById(id);
     const numero = valor => new Intl.NumberFormat("pt-BR",{maximumFractionDigits:0}).format(Number(valor)||0);
+    const numeroDecimal = valor => new Intl.NumberFormat("pt-BR",{
+      minimumFractionDigits:1,
+      maximumFractionDigits:1
+    }).format(Number(valor)||0);
     const percentual = valor => new Intl.NumberFormat("pt-BR",{style:"percent",minimumFractionDigits:1,maximumFractionDigits:1}).format(Number(valor)||0);
 
     function normalizarMes(valor) {
@@ -775,16 +779,19 @@
 
     function calcularResumo(dados) {
       /*
-       * Regra do painel:
-       * 1. Para cada unidade e período, calcula a média dos ativos informados.
-       *    Isso impede que registros duplicados do mesmo mês multipliquem o quadro.
-       * 2. Soma os ativos médios das unidades em cada período.
-       * 3. Calcula a média mensal dos profissionais ativos.
-       * 4. Índice de Atividade da Educação Permanente =
-       *    total de profissionais treinados / média mensal de profissionais ativos.
+       * Índice de Atividade da Educação Permanente — período de 6 meses:
        *
-       * Esta é a regra institucional definida para o indicador.
+       * 1. Soma os profissionais ativos dos seis meses.
+       * 2. Divide a soma dos ativos por 6 para obter a média mensal de ativos.
+       * 3. Soma os profissionais treinados dos seis meses.
+       * 4. Divide a soma dos treinados por 6 para obter a média mensal de treinados.
+       * 5. Índice = média mensal de treinados / média mensal de ativos × 100.
+       *
+       * Para evitar duplicar o quadro ativo quando uma unidade possui mais de
+       * um registro no mesmo mês, primeiro é calculada a média dos ativos por
+       * unidade e período.
        */
+      const QUANTIDADE_MESES_INDICE = 6;
       const unidadePeriodo = new Map();
 
       dados.forEach(dado => {
@@ -804,7 +811,10 @@
 
         const grupo = unidadePeriodo.get(chave);
 
-        if (Number.isFinite(dado.profissionaisAtivos) && dado.profissionaisAtivos >= 0) {
+        if (
+          Number.isFinite(dado.profissionaisAtivos) &&
+          dado.profissionaisAtivos >= 0
+        ) {
           grupo.somaAtivos += dado.profissionaisAtivos;
           grupo.registrosAtivos += 1;
         }
@@ -832,28 +842,35 @@
       });
 
       const totaisPeriodos = [...periodos.values()];
-      const somaAtivosMensais = totaisPeriodos.reduce(
+
+      const somaAtivos = totaisPeriodos.reduce(
         (soma, item) => soma + item.ativos,
         0
       );
 
-      const mediaMensalAtivos = totaisPeriodos.length
-        ? somaAtivosMensais / totaisPeriodos.length
-        : 0;
-
-      const totalTreinados = dados.reduce(
-        (soma, dado) => soma + (Number(dado.profissionaisTreinados) || 0),
+      const somaTreinados = totaisPeriodos.reduce(
+        (soma, item) => soma + item.treinados,
         0
       );
 
+      const mediaMensalAtivos =
+        somaAtivos / QUANTIDADE_MESES_INDICE;
+
+      const mediaMensalTreinados =
+        somaTreinados / QUANTIDADE_MESES_INDICE;
+
+      const indiceGeral = mediaMensalAtivos
+        ? mediaMensalTreinados / mediaMensalAtivos
+        : 0;
+
       return {
         mediaMensalAtivos,
-        totalTreinados,
-        somaAtivosPeriodos: somaAtivosMensais,
-        indiceGeral: mediaMensalAtivos
-          ? totalTreinados / mediaMensalAtivos
-          : 0,
-        quantidadePeriodos: periodos.size,
+        mediaMensalTreinados,
+        totalTreinados: somaTreinados,
+        somaAtivosPeriodos: somaAtivos,
+        indiceGeral,
+        quantidadeMesesIndice: QUANTIDADE_MESES_INDICE,
+        quantidadePeriodosEncontrados: periodos.size,
         quantidadeUnidades: new Set(
           dados.map(dado => dado.unidade).filter(Boolean)
         ).size,
@@ -889,10 +906,23 @@
         percentual(resumo.indiceGeral);
 
       $("formulaIndiceGeral").textContent =
+        "Média treinados: " +
         numero(resumo.totalTreinados) +
-        " treinados ÷ " +
-        numero(resumo.mediaMensalAtivos) +
-        " profissionais ativos × 100";
+        " ÷ " +
+        resumo.quantidadeMesesIndice +
+        " = " +
+        numeroDecimal(resumo.mediaMensalTreinados) +
+        " | Média ativos: " +
+        numero(resumo.somaAtivosPeriodos) +
+        " ÷ " +
+        resumo.quantidadeMesesIndice +
+        " = " +
+        numeroDecimal(resumo.mediaMensalAtivos) +
+        " | Índice: " +
+        numeroDecimal(resumo.mediaMensalTreinados) +
+        " ÷ " +
+        numeroDecimal(resumo.mediaMensalAtivos) +
+        " × 100";
 
       atualizarSemaforoIndice(resumo.indiceGeral);
     }
