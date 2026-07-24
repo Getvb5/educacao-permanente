@@ -159,7 +159,7 @@
       width:100%; min-height:44px; border:1px solid var(--borda);
       border-radius:10px; padding:9px 12px; background:white;
     }
-    .cards { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:18px; }
+    .cards { display:grid; grid-template-columns:repeat(5,1fr); gap:16px; margin-bottom:18px; }
     .card { padding:20px; border-top:4px solid var(--amarelo-recife); }
     .grafico h2::after {
       content:"";
@@ -184,6 +184,56 @@
     .rotulo { color:var(--suave); font-size:14px; font-weight:700; margin-bottom:12px; }
     .valor { color:var(--azul-recife-escuro); font-weight:800; font-size:32px; }
     .detalhe { color:var(--suave); font-size:12px; margin-top:8px; }
+    .status-indice {
+      display:flex;
+      align-items:center;
+      gap:8px;
+      margin-top:10px;
+      font-size:12px;
+      font-weight:800;
+    }
+    .status-dot {
+      width:12px;
+      height:12px;
+      border-radius:50%;
+      flex:0 0 12px;
+      box-shadow:0 0 0 3px rgba(0,0,0,.04);
+    }
+    .status-insatisfatorio { color:#B91C1C; }
+    .status-insatisfatorio .status-dot { background:#FF3B30; }
+    .status-intermediario { color:#A16207; }
+    .status-intermediario .status-dot { background:#FACC15; }
+    .status-satisfatorio { color:#15803D; }
+    .status-satisfatorio .status-dot { background:#22C55E; }
+    .legenda-semaforo {
+      display:flex;
+      flex-wrap:wrap;
+      gap:14px 24px;
+      align-items:center;
+      margin:-2px 0 18px;
+      padding:14px 16px;
+      border-left:5px solid var(--amarelo-recife);
+      border-radius:12px;
+      background:rgba(255,255,255,.96);
+      color:var(--azul-recife-escuro);
+      box-shadow:0 8px 20px rgba(0,28,56,.10);
+    }
+    .legenda-semaforo strong {
+      min-width:max-content;
+      color:var(--azul-recife-escuro);
+    }
+    .item-legenda {
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-size:13px;
+      font-weight:700;
+    }
+    .item-legenda .status-dot {
+      width:14px;
+      height:14px;
+      flex:0 0 14px;
+    }
     .graficos { display:grid; grid-template-columns:1.1fr .9fr; gap:18px; margin-bottom:18px; }
     .grafico { padding:20px; min-height:390px; }
     .canvas { position:relative; height:320px; }
@@ -424,35 +474,33 @@
           <div id="qtdPeriodos" class="valor">0</div>
           <div class="detalhe">Combinações distintas de ano e mês</div>
         </article>
+
+        <article class="painel card">
+          <div class="rotulo">Índice de Educação Permanente</div>
+          <div id="indiceEducacaoPermanente" class="valor">0%</div>
+          <div id="formulaIndiceGeral" class="detalhe">
+            Profissionais treinados ÷ profissionais ativos × 100
+          </div>
+          <div id="statusIndice" class="status-indice status-insatisfatorio">
+            <span class="status-dot" aria-hidden="true"></span>
+            <span id="textoStatusIndice">Insatisfatório</span>
+          </div>
+        </article>
       </section>
 
-      <section id="indicadorDetalhado" class="painel indicador-detalhado" hidden>
-        <div class="indicador-topo">
-          <div>
-            <h2>Índice de Atividade da Educação Permanente</h2>
-            <p id="descricaoIndicador">Selecione exatamente um ano, um mês e uma unidade.</p>
-          </div>
-          <span class="selo-indicador">Indicador mensal detalhado</span>
+      <section class="legenda-semaforo" aria-label="Meta do índice de educação permanente">
+        <strong>Meta:</strong>
+        <div class="item-legenda status-insatisfatorio">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span>Insatisfatório: &lt; 50%</span>
         </div>
-
-        <div class="cards-detalhe">
-          <article class="card-detalhe">
-            <div class="rotulo">Profissionais ativos</div>
-            <div id="ativosDetalhe" class="valor">0</div>
-            <div class="detalhe">Quadro ativo informado para o recorte</div>
-          </article>
-
-          <article class="card-detalhe">
-            <div class="rotulo">Profissionais treinados</div>
-            <div id="treinadosDetalhe" class="valor">0</div>
-            <div class="detalhe">Participações registradas no recorte</div>
-          </article>
-
-          <article class="card-detalhe">
-            <div class="rotulo">Índice de atividade</div>
-            <div id="indiceDetalhe" class="valor">0%</div>
-            <div id="formulaIndicador" class="detalhe">Treinados ÷ ativos</div>
-          </article>
+        <div class="item-legenda status-intermediario">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span>Intermediário: de 50% a 70%</span>
+        </div>
+        <div class="item-legenda status-satisfatorio">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span>Satisfatório: &ge; 70%</span>
         </div>
       </section>
 
@@ -697,9 +745,28 @@
 
       atualizarDescricaoRecorte();
       atualizarCardsGerais();
-      atualizarIndicadorDetalhado();
       atualizarTabela();
       atualizarGraficos();
+    }
+
+    function atualizarSemaforoIndice(indice) {
+      const container = $("statusIndice");
+      const texto = $("textoStatusIndice");
+      const percentualIndice = (Number(indice) || 0) * 100;
+
+      let classe = "status-insatisfatorio";
+      let rotulo = "Insatisfatório";
+
+      if (percentualIndice >= 70) {
+        classe = "status-satisfatorio";
+        rotulo = "Satisfatório";
+      } else if (percentualIndice >= 50) {
+        classe = "status-intermediario";
+        rotulo = "Intermediário";
+      }
+
+      container.className = `status-indice ${classe}`;
+      texto.textContent = rotulo;
     }
 
     function chavePeriodo(dado) {
@@ -809,41 +876,25 @@
         filtrados.map(dado => chavePeriodo(dado))
       );
 
+      const resumo = calcularResumo(filtrados);
+
       $("totalRegistros").textContent = numero(totalRegistros);
       $("totalParticipacoes").textContent = numero(totalParticipacoes);
       $("qtdUnidades").textContent = numero(unidades.size);
       $("qtdPeriodos").textContent = numero(periodos.size);
-    }
 
-    function atualizarIndicadorDetalhado() {
-      const painel = $("indicadorDetalhado");
+      // Índice de Educação Permanente:
+      // profissionais treinados ÷ profissionais ativos × 100.
+      $("indiceEducacaoPermanente").textContent =
+        percentual(resumo.indiceGeral);
 
-      if (!possuiRecorteExato()) {
-        painel.hidden = true;
-        return;
-      }
-
-      const filtros = filtrosSelecionados();
-      const resumo = calcularResumo(filtrados);
-
-      $("ativosDetalhe").textContent = numero(resumo.mediaMensalAtivos);
-      $("treinadosDetalhe").textContent = numero(resumo.totalTreinados);
-      $("indiceDetalhe").textContent = percentual(resumo.indiceGeral);
-
-      $("formulaIndicador").textContent =
+      $("formulaIndiceGeral").textContent =
         numero(resumo.totalTreinados) +
         " treinados ÷ " +
         numero(resumo.mediaMensalAtivos) +
-        " profissionais ativos";
+        " profissionais ativos × 100";
 
-      $("descricaoIndicador").textContent =
-        filtros.unidades[0] +
-        " • " +
-        filtros.meses[0] +
-        " de " +
-        filtros.anos[0];
-
-      painel.hidden = false;
+      atualizarSemaforoIndice(resumo.indiceGeral);
     }
 
     function atualizarTabela() {
