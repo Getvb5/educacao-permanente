@@ -326,20 +326,17 @@
     </header>
 
     <section class="painel filtros">
-      <div style="grid-column:1/-1; margin-bottom:2px; color:var(--azul-recife-escuro); font-size:13px; font-weight:700;">
-        Para exibir o indicador corretamente, selecione obrigatoriamente: <strong>ano</strong>, <strong>mês</strong> e <strong>unidade</strong>.
-      </div>
       <div>
         <label for="ano">Ano de referência</label>
-        <select id="ano"><option value="">Selecione o ano</option></select>
+        <select id="ano"><option value="">Selecione um ano</option></select>
       </div>
       <div>
         <label for="mes">Mês de referência</label>
-        <select id="mes"><option value="">Selecione o mês</option></select>
+        <select id="mes"><option value="">Selecione um mês</option></select>
       </div>
       <div>
         <label for="unidade">Unidade de saúde</label>
-        <select id="unidade"><option value="">Selecione a unidade</option></select>
+        <select id="unidade"><option value="">Selecione uma unidade</option></select>
       </div>
       <button id="limpar" class="secundario">Limpar filtros</button>
     </section>
@@ -487,9 +484,15 @@
 
     function preencherSelect(id,valores,textoInicial) {
       const select = $(id);
-      const valorAtual = select.value;
-      select.innerHTML = `<option value="">${textoInicial}</option>` + valores.map(v => `<option value="${escapar(v)}">${escapar(v)}</option>`).join("");
-      if (valores.includes(valorAtual)) select.value = valorAtual;
+      const selecionadosAtuais = [...select.selectedOptions].map(option => option.value);
+
+      select.innerHTML = valores
+        .map(valor => `<option value="${escapar(valor)}">${escapar(valor)}</option>`)
+        .join("");
+
+      [...select.options].forEach(option => {
+        option.selected = selecionadosAtuais.includes(option.value);
+      });
     }
 
     function preencherFiltros() {
@@ -497,22 +500,32 @@
       const meses = [...new Set(base.map(d=>d.mesReferencia).filter(Boolean))].sort(ordenarMeses);
       const unidades = [...new Set(base.map(d=>d.unidade).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"pt-BR"));
 
-      preencherSelect("ano",anos,"Selecione o ano");
-      preencherSelect("mes",meses,"Selecione o mês");
-      preencherSelect("unidade",unidades,"Selecione a unidade");
+      preencherSelect("ano",anos,"Selecione os anos");
+      preencherSelect("mes",meses,"Selecione os meses");
+      preencherSelect("unidade",unidades,"Selecione as unidades");
+    }
+
+    function valoresSelecionados(id) {
+      return [...$(id).selectedOptions]
+        .map(option => option.value)
+        .filter(Boolean);
     }
 
     function filtrosSelecionados() {
       return {
-        ano: $("ano").value,
-        mes: $("mes").value,
-        unidade: $("unidade").value
+        anos: valoresSelecionados("ano"),
+        meses: valoresSelecionados("mes"),
+        unidades: valoresSelecionados("unidade")
       };
     }
 
     function filtrosObrigatoriosPreenchidos() {
       const filtros = filtrosSelecionados();
-      return Boolean(filtros.ano && filtros.mes && filtros.unidade);
+      return Boolean(
+        filtros.anos.length &&
+        filtros.meses.length &&
+        filtros.unidades.length
+      );
     }
 
     function mostrarOrientacaoInicial() {
@@ -522,11 +535,11 @@
       $("estado").hidden = false;
       $("estado").innerHTML = `
         <div class="estado-icone" aria-hidden="true">⌕</div>
-        <div class="estado-titulo">Selecione ano, mês e unidade</div>
+        <div class="estado-titulo">Selecione um filtro para visualizar os resultados</div>
         <p class="estado-texto">
           Os indicadores, gráficos e registros detalhados somente serão exibidos
-          somente após a seleção dos três filtros obrigatórios: <strong>ano</strong>,
-          <strong>mês</strong> e <strong>unidade</strong>.
+          após a seleção de pelo menos um recorte por <strong>ano</strong>,
+          <strong>mês</strong> ou <strong>unidade</strong>.
         </p>
       `;
     }
@@ -539,8 +552,8 @@
         <div class="estado-icone" aria-hidden="true">!</div>
         <div class="estado-titulo">Nenhum registro encontrado</div>
         <p class="estado-texto">
-          Não há dados para a combinação de ano, mês e unidade selecionada.
-          Revise os três filtros e tente novamente.
+          Não há dados para a combinação de filtros selecionada.
+          Ajuste o ano, o mês ou a unidade e tente novamente.
         </p>
       `;
     }
@@ -549,16 +562,16 @@
       const filtros = filtrosSelecionados();
       const partes = [];
 
-      if (filtros.ano) partes.push("Ano: " + filtros.ano);
-      if (filtros.mes) partes.push("Mês: " + filtros.mes);
-      if (filtros.unidade) partes.push("Unidade: " + filtros.unidade);
+      if (filtros.anos.length) partes.push("Anos: " + filtros.anos.join(", "));
+      if (filtros.meses.length) partes.push("Meses: " + filtros.meses.join(", "));
+      if (filtros.unidades.length) partes.push("Unidades: " + filtros.unidades.join(", "));
 
       $("recorteAtivo").textContent =
         "Recorte aplicado — " + partes.join("  •  ");
     }
 
     function aplicarFiltros() {
-      const {ano, mes, unidade} = filtrosSelecionados();
+      const {anos, meses, unidades} = filtrosSelecionados();
 
       if (!filtrosObrigatoriosPreenchidos()) {
         mostrarOrientacaoInicial();
@@ -566,9 +579,9 @@
       }
 
       filtrados = base.filter(d =>
-        (!ano || d.anoReferencia === ano) &&
-        (!mes || d.mesReferencia === mes) &&
-        (!unidade || d.unidade === unidade)
+        anos.includes(d.anoReferencia) &&
+        meses.includes(d.mesReferencia) &&
+        unidades.includes(d.unidade)
       );
 
       if (!filtrados.length) {
@@ -810,8 +823,8 @@
     }
 
     function exportarCsv() {
-      if (!filtrosObrigatoriosPreenchidos() || !filtrados.length) {
-        alert("Selecione ano, mês e unidade antes de exportar os dados.");
+      if (!existeFiltroAtivo() || !filtrados.length) {
+        alert("Selecione pelo menos um filtro antes de exportar os dados.");
         return;
       }
 
@@ -847,9 +860,9 @@
 
     ["ano","mes","unidade"].forEach(id=>$(id).addEventListener("change",aplicarFiltros));
     $("limpar").addEventListener("click",()=>{
-      $("ano").value="";
-      $("mes").value="";
-      $("unidade").value="";
+      ["ano","mes","unidade"].forEach(id => {
+        [...$(id).options].forEach(option => option.selected = false);
+      });
       mostrarOrientacaoInicial();
     });
     $("atualizar").addEventListener("click",carregar);
