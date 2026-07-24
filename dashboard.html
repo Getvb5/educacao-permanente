@@ -373,7 +373,7 @@
         <div class="cabecalho-direita">
           <div class="acoes" aria-label="Ações do dashboard">
             <a href="index.html" class="botao secundario">Voltar ao formulário</a>
-            <button id="atualizar" class="primario">Atualizar dados</button>
+            <button id="atualizar" type="button" class="primario">Atualizar dados</button>
           </div>
         </div>
       </div>
@@ -392,7 +392,7 @@
         <label for="unidade">Unidade de saúde</label>
         <select id="unidade"><option value="">Selecione uma unidade</option></select>
       </div>
-      <button id="limpar" class="secundario">Limpar filtros</button>
+      <button id="limpar" type="button" class="secundario">Limpar filtros</button>
     </section>
 
     <section id="estado" class="painel estado">Carregando dados...</section>
@@ -479,7 +479,7 @@
             <h2>Registros detalhados</h2>
             <p id="resumoTabela">0 registro(s).</p>
           </div>
-          <button id="exportar" class="secundario">Exportar CSV</button>
+          <button id="exportar" type="button" class="secundario">Exportar CSV</button>
         </div>
 
         <div class="rolagem">
@@ -662,8 +662,14 @@
           : "Todas as unidades"
       );
 
-      $("recorteAtivo").textContent =
-        "Visão apresentada — " + partes.join("  •  ");
+      const semFiltros =
+        !filtros.anos.length &&
+        !filtros.meses.length &&
+        !filtros.unidades.length;
+
+      $("recorteAtivo").textContent = semFiltros
+        ? "Visão geral — todos os anos, todos os meses e todas as unidades"
+        : "Visão apresentada — " + partes.join("  •  ");
     }
 
     function aplicarFiltros() {
@@ -1074,10 +1080,27 @@
     }
 
     ["ano","mes","unidade"].forEach(id=>$(id).addEventListener("change",aplicarFiltros));
-    $("limpar").addEventListener("click",()=>{
-      ["ano","mes","unidade"].forEach(id => {
-        [...$(id).options].forEach(option => option.selected = false);
+    function limparFiltros() {
+      ["ano", "mes", "unidade"].forEach(id => {
+        const select = $(id);
+
+        // Os filtros permitem múltipla seleção; por isso,
+        // cada opção precisa ser desmarcada individualmente.
+        [...select.options].forEach(option => {
+          option.selected = false;
+        });
+
+        select.selectedIndex = -1;
       });
+
+      // Sem nenhuma seleção, a visão geral completa é reapresentada.
+      aplicarFiltros();
+    }
+
+    $("limpar").addEventListener("click", evento => {
+      evento.preventDefault();
+      limparFiltros();
+    });
       aplicarFiltros();
     });
     $("atualizar").addEventListener("click",carregar);
