@@ -579,6 +579,13 @@
       return String(valor || "").trim().toLocaleLowerCase("pt-BR");
     }
 
+    function padronizarNomeUnidade(valor) {
+      return String(valor || "")
+        .replace(/\bValdemar\b/gi, "Waldemar")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
     function ordenarMeses(a,b) {
       const ia = ORDEM_MESES.indexOf(normalizarMes(a));
       const ib = ORDEM_MESES.indexOf(normalizarMes(b));
@@ -615,7 +622,7 @@
           dataRegistro:String(d.dataRegistro || ""),
           anoReferencia:String(d.anoReferencia || "").trim(),
           mesReferencia:String(d.mesReferencia || "").trim(),
-          unidade:String(d.unidade || "").trim(),
+          unidade:padronizarNomeUnidade(d.unidade),
           responsavel:String(d.responsavel || "").trim(),
           email:String(d.email || "").trim(),
           profissionaisAtivos:Number(d.profissionaisAtivos) || 0,
