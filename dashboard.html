@@ -541,7 +541,7 @@
                 <th>Treinados</th>
                 <th>Responsável</th>
                 <th>Lista de presença</th>
-                <th>Observações</th>
+                <th>Índice de participação</th>
               </tr>
             </thead>
             <tbody id="corpo"></tbody>
@@ -952,7 +952,7 @@
           <td>${numero(dado.profissionaisTreinados)}</td>
           <td>${escapar(dado.responsavel)}${dado.email ? `<br><small>${escapar(dado.email)}</small>` : ""}</td>
           <td>${linkLista}</td>
-          <td>${escapar(dado.observacoes || "—")}</td>
+          <td><strong>${percentual(dado.indiceParticipacao)}</strong></td>
         </tr>`;
       }).join("") ||
         '<tr><td colspan="8">Nenhum registro encontrado para os filtros selecionados.</td></tr>';
@@ -1134,7 +1134,7 @@
         "PROFISSIONAIS_ATIVOS",
         "PROFISSIONAIS_TREINADOS",
         "LINK_LISTA_PRESENCA",
-        "OBSERVACOES"
+        "INDICE_PARTICIPACAO"
       ], ...filtrados.map(dado => [
         dado.anoReferencia,
         dado.mesReferencia,
@@ -1144,7 +1144,7 @@
         dado.profissionaisAtivos,
         dado.profissionaisTreinados,
         dado.linkListaPresenca,
-        dado.observacoes
+        percentual(dado.indiceParticipacao)
       ])];
 
       const csv = linhas
