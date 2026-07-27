@@ -234,7 +234,7 @@
       height:14px;
       flex:0 0 14px;
     }
-    .graficos { display:grid; grid-template-columns:1.1fr .9fr; gap:18px; margin-bottom:18px; }
+    .graficos { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; margin-bottom:18px; }
     .grafico { padding:20px; min-height:390px; }
     .canvas { position:relative; height:320px; }
     .tabela { padding:20px; }
@@ -513,11 +513,6 @@
         <article class="painel grafico">
           <h2>Participações por mês</h2>
           <div class="canvas"><canvas id="graficoMeses"></canvas></div>
-        </article>
-
-        <article class="painel grafico">
-          <h2>Participações por unidade</h2>
-          <div class="canvas"><canvas id="graficoTreinados"></canvas></div>
         </article>
       </section>
 
@@ -1012,10 +1007,6 @@
         chartMeses.destroy();
         chartMeses = null;
       }
-      if (chartTreinados) {
-        chartTreinados.destroy();
-        chartTreinados = null;
-      }
     }
 
     function atualizarGraficos() {
@@ -1027,13 +1018,6 @@
         .slice(0, 15);
 
       const participacoesPorPeriodo = agruparParticipacoesPorPeriodo();
-
-      const treinadosPorUnidade = Object.entries(
-        somarTreinadosPor("unidade")
-      )
-        .map(([nome, total]) => ({nome, total}))
-        .sort((a, b) => b.total - a.total)
-        .slice(0, 15);
 
       chartUnidades = new Chart($("graficoUnidades"), {
         type: "bar",
@@ -1091,33 +1075,7 @@
           }
         }
       });
-
-      chartTreinados = new Chart($("graficoTreinados"), {
-        type: "bar",
-        data: {
-          labels: treinadosPorUnidade.map(item => item.nome),
-          datasets: [{
-            data: treinadosPorUnidade.map(item => item.total),
-            backgroundColor: "rgba(0,63,115,.78)",
-            borderColor: "#F2E600",
-            borderWidth: 1,
-            borderRadius: 6
-          }]
-        },
-        options: {
-          indexAxis: "y",
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {legend: {display: false}},
-          scales: {
-            x: {
-              beginAtZero: true,
-              ticks: {precision: 0}
-            }
-          }
-        }
-      });
-    }
+}
 
     function exportarCsv() {
       if (!filtrados.length) {
