@@ -174,12 +174,12 @@
 
     .multiselect-trigger {
       width:100%;
-      min-height:44px;
+      min-height:46px;
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:10px;
-      padding:9px 12px;
+      padding:10px 13px;
       border:1px solid var(--borda);
       border-radius:10px;
       background:#ffffff;
@@ -187,10 +187,14 @@
       font:inherit;
       text-align:left;
       cursor:pointer;
+      transition:border-color .18s ease, box-shadow .18s ease;
     }
 
-    .multiselect-trigger:hover {
+    .multiselect-trigger:hover,
+    .multiselect-trigger:focus {
       border-color:var(--azul-recife);
+      box-shadow:0 0 0 3px rgba(0,92,169,.10);
+      outline:none;
     }
 
     .multiselect-resumo {
@@ -202,99 +206,17 @@
       font-weight:700;
     }
 
-    .multiselect-seta {
+    .multiselect-icone {
       flex:0 0 auto;
+      width:24px;
+      height:24px;
+      display:grid;
+      place-items:center;
+      border-radius:50%;
+      background:var(--azul-recife-claro);
       color:var(--azul-recife);
-      font-size:15px;
-      transition:transform .18s ease;
-    }
-
-    .multiselect.aberto .multiselect-seta {
-      transform:rotate(180deg);
-    }
-
-    .multiselect-menu {
-      position:absolute;
-      z-index:40;
-      top:calc(100% + 7px);
-      left:0;
-      width:min(360px,92vw);
-      padding:12px;
-      border:1px solid var(--borda);
-      border-radius:12px;
-      background:#ffffff;
-      box-shadow:0 18px 40px rgba(0,43,82,.22);
-    }
-
-    .multiselect-menu[hidden] {
-      display:none;
-    }
-
-    .multiselect-busca {
-      width:100%;
-      min-height:40px;
-      margin-bottom:9px;
-      padding:8px 10px;
-      border:1px solid var(--borda);
-      border-radius:9px;
-      font:inherit;
-    }
-
-    .multiselect-acoes {
-      display:flex;
-      flex-wrap:wrap;
-      gap:7px;
-      margin-bottom:9px;
-    }
-
-    .multiselect-acao {
-      min-height:32px;
-      padding:6px 9px;
-      border:1px solid rgba(0,92,169,.22);
-      border-radius:8px;
-      background:var(--azul-recife-claro);
-      color:var(--azul-recife-escuro);
-      font-size:11px;
-      font-weight:800;
-      cursor:pointer;
-    }
-
-    .multiselect-opcoes {
-      max-height:250px;
-      overflow:auto;
-      padding-right:3px;
-    }
-
-    .multiselect-opcao {
-      display:flex;
-      align-items:flex-start;
-      gap:9px;
-      margin:0;
-      padding:8px 7px;
-      border-radius:8px;
-      color:var(--texto);
-      font-size:12px;
-      font-weight:600;
-      cursor:pointer;
-    }
-
-    .multiselect-opcao:hover {
-      background:var(--azul-recife-claro);
-    }
-
-    .multiselect-opcao input {
-      width:16px;
-      height:16px;
-      margin:0;
-      flex:0 0 16px;
-      accent-color:var(--azul-recife);
-    }
-
-    .multiselect-vazio {
-      padding:16px 8px;
-      color:var(--suave);
-      font-size:12px;
-      text-align:center;
+      font-size:14px;
+      font-weight:900;
     }
 
     .filtro-ajuda {
@@ -303,6 +225,186 @@
       color:var(--suave);
       font-size:12px;
       line-height:1.45;
+    }
+
+    .filtro-modal-backdrop {
+      position:fixed;
+      z-index:1000;
+      inset:0;
+      display:grid;
+      place-items:center;
+      padding:20px;
+      background:rgba(0,31,61,.56);
+      backdrop-filter:blur(3px);
+    }
+
+    .filtro-modal-backdrop[hidden] {
+      display:none;
+    }
+
+    .filtro-modal {
+      width:min(560px,100%);
+      max-height:min(720px,calc(100vh - 40px));
+      display:flex;
+      flex-direction:column;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.42);
+      border-radius:18px;
+      background:#ffffff;
+      box-shadow:0 28px 70px rgba(0,22,44,.32);
+    }
+
+    .filtro-modal-cabecalho {
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:16px;
+      padding:20px 22px 14px;
+      border-bottom:1px solid var(--borda);
+    }
+
+    .filtro-modal-cabecalho h2 {
+      margin:0 0 5px;
+      color:var(--azul-recife-escuro);
+      font-size:19px;
+    }
+
+    .filtro-modal-cabecalho p {
+      margin:0;
+      color:var(--suave);
+      font-size:12px;
+      line-height:1.45;
+    }
+
+    .filtro-modal-fechar {
+      width:36px;
+      height:36px;
+      display:grid;
+      place-items:center;
+      flex:0 0 36px;
+      padding:0;
+      border:1px solid var(--borda);
+      border-radius:10px;
+      background:#ffffff;
+      color:var(--azul-recife-escuro);
+      font-size:20px;
+      cursor:pointer;
+    }
+
+    .filtro-modal-corpo {
+      min-height:0;
+      display:flex;
+      flex-direction:column;
+      padding:16px 22px;
+    }
+
+    .filtro-modal-busca {
+      width:100%;
+      min-height:44px;
+      margin-bottom:12px;
+      padding:10px 12px;
+      border:1px solid var(--borda);
+      border-radius:10px;
+      font:inherit;
+    }
+
+    .filtro-modal-acoes {
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-bottom:12px;
+    }
+
+    .filtro-modal-acao {
+      min-height:34px;
+      padding:7px 10px;
+      border:1px solid rgba(0,92,169,.20);
+      border-radius:8px;
+      background:var(--azul-recife-claro);
+      color:var(--azul-recife-escuro);
+      font-size:12px;
+      font-weight:800;
+      cursor:pointer;
+    }
+
+    .filtro-modal-opcoes {
+      min-height:120px;
+      max-height:370px;
+      overflow:auto;
+      padding:4px;
+      border:1px solid var(--borda);
+      border-radius:12px;
+      background:#FBFDFF;
+    }
+
+    .filtro-modal-opcao {
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+      margin:0;
+      padding:10px 9px;
+      border-radius:9px;
+      color:var(--texto);
+      font-size:13px;
+      font-weight:600;
+      cursor:pointer;
+    }
+
+    .filtro-modal-opcao:hover {
+      background:var(--azul-recife-claro);
+    }
+
+    .filtro-modal-opcao input {
+      width:17px;
+      height:17px;
+      margin:0;
+      flex:0 0 17px;
+      accent-color:var(--azul-recife);
+    }
+
+    .filtro-modal-vazio {
+      padding:28px 12px;
+      color:var(--suave);
+      font-size:13px;
+      text-align:center;
+    }
+
+    .filtro-modal-rodape {
+      display:flex;
+      justify-content:flex-end;
+      gap:10px;
+      padding:15px 22px 20px;
+      border-top:1px solid var(--borda);
+      background:#F8FBFE;
+    }
+
+    .filtro-modal-rodape button {
+      min-height:42px;
+    }
+
+    @media(max-width:620px) {
+      .filtro-modal-backdrop {
+        align-items:end;
+        padding:0;
+      }
+
+      .filtro-modal {
+        width:100%;
+        max-height:88vh;
+        border-radius:20px 20px 0 0;
+      }
+
+      .filtro-modal-cabecalho,
+      .filtro-modal-corpo,
+      .filtro-modal-rodape {
+        padding-left:16px;
+        padding-right:16px;
+      }
+
+      .filtro-modal-rodape {
+        display:grid;
+        grid-template-columns:1fr 1fr;
+      }
     }
     .cards { display:grid; grid-template-columns:repeat(5,1fr); gap:16px; margin-bottom:18px; }
     .card { padding:20px; border-top:4px solid var(--amarelo-recife); }
@@ -587,121 +689,107 @@
     <section class="painel filtros">
       <div>
         <label id="label-ano">Ano de referência</label>
-        <div id="multi-ano" class="multiselect">
+        <div class="multiselect">
           <button
             id="gatilho-ano"
             type="button"
             class="multiselect-trigger"
-            aria-expanded="false"
-            aria-controls="menu-ano"
             aria-labelledby="label-ano resumo-ano"
           >
             <span id="resumo-ano" class="multiselect-resumo">Todos os anos</span>
-            <span class="multiselect-seta" aria-hidden="true">⌄</span>
+            <span class="multiselect-icone" aria-hidden="true">+</span>
           </button>
-
-          <div id="menu-ano" class="multiselect-menu" hidden>
-            <input
-              id="busca-ano"
-              class="multiselect-busca"
-              type="search"
-              placeholder="Buscar ano..."
-              autocomplete="off"
-            >
-
-            <div class="multiselect-acoes">
-              <button type="button" class="multiselect-acao" data-acao="todos" data-filtro="ano">
-                Selecionar todos
-              </button>
-              <button type="button" class="multiselect-acao" data-acao="limpar" data-filtro="ano">
-                Limpar seleção
-              </button>
-            </div>
-
-            <div id="opcoes-ano" class="multiselect-opcoes"></div>
-          </div>
         </div>
       </div>
+
       <div>
         <label id="label-mes">Mês de referência</label>
-        <div id="multi-mes" class="multiselect">
+        <div class="multiselect">
           <button
             id="gatilho-mes"
             type="button"
             class="multiselect-trigger"
-            aria-expanded="false"
-            aria-controls="menu-mes"
             aria-labelledby="label-mes resumo-mes"
           >
             <span id="resumo-mes" class="multiselect-resumo">Todos os meses</span>
-            <span class="multiselect-seta" aria-hidden="true">⌄</span>
+            <span class="multiselect-icone" aria-hidden="true">+</span>
           </button>
-
-          <div id="menu-mes" class="multiselect-menu" hidden>
-            <input
-              id="busca-mes"
-              class="multiselect-busca"
-              type="search"
-              placeholder="Buscar mês..."
-              autocomplete="off"
-            >
-
-            <div class="multiselect-acoes">
-              <button type="button" class="multiselect-acao" data-acao="todos" data-filtro="mes">
-                Selecionar todos
-              </button>
-              <button type="button" class="multiselect-acao" data-acao="limpar" data-filtro="mes">
-                Limpar seleção
-              </button>
-            </div>
-
-            <div id="opcoes-mes" class="multiselect-opcoes"></div>
-          </div>
         </div>
       </div>
+
       <div>
         <label id="label-unidade">Unidade de saúde</label>
-        <div id="multi-unidade" class="multiselect">
+        <div class="multiselect">
           <button
             id="gatilho-unidade"
             type="button"
             class="multiselect-trigger"
-            aria-expanded="false"
-            aria-controls="menu-unidade"
             aria-labelledby="label-unidade resumo-unidade"
           >
             <span id="resumo-unidade" class="multiselect-resumo">Todas as unidades</span>
-            <span class="multiselect-seta" aria-hidden="true">⌄</span>
+            <span class="multiselect-icone" aria-hidden="true">+</span>
           </button>
-
-          <div id="menu-unidade" class="multiselect-menu" hidden>
-            <input
-              id="busca-unidade"
-              class="multiselect-busca"
-              type="search"
-              placeholder="Buscar unidade..."
-              autocomplete="off"
-            >
-
-            <div class="multiselect-acoes">
-              <button type="button" class="multiselect-acao" data-acao="todos" data-filtro="unidade">
-                Selecionar todos
-              </button>
-              <button type="button" class="multiselect-acao" data-acao="limpar" data-filtro="unidade">
-                Limpar seleção
-              </button>
-            </div>
-
-            <div id="opcoes-unidade" class="multiselect-opcoes"></div>
-          </div>
         </div>
       </div>
+
       <button id="limpar" type="button" class="secundario">Limpar filtros</button>
 
       <p class="filtro-ajuda">
-        Selecione uma ou várias opções. Sem seleção, o dashboard considera todos os valores disponíveis.
+        Clique em cada filtro para escolher uma ou várias opções. As seleções somente são aplicadas após a confirmação.
       </p>
     </section>
+
+    <div id="modalFiltro" class="filtro-modal-backdrop" hidden>
+      <section
+        class="filtro-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="tituloModalFiltro"
+      >
+        <header class="filtro-modal-cabecalho">
+          <div>
+            <h2 id="tituloModalFiltro">Selecionar filtro</h2>
+            <p>Marque uma ou várias opções e clique em “Aplicar seleção”.</p>
+          </div>
+          <button
+            id="fecharModalFiltro"
+            type="button"
+            class="filtro-modal-fechar"
+            aria-label="Fechar"
+          >×</button>
+        </header>
+
+        <div class="filtro-modal-corpo">
+          <input
+            id="buscaModalFiltro"
+            class="filtro-modal-busca"
+            type="search"
+            placeholder="Buscar..."
+            autocomplete="off"
+          >
+
+          <div class="filtro-modal-acoes">
+            <button id="selecionarTodosModal" type="button" class="filtro-modal-acao">
+              Selecionar todos
+            </button>
+            <button id="limparSelecaoModal" type="button" class="filtro-modal-acao">
+              Limpar seleção
+            </button>
+          </div>
+
+          <div id="opcoesModalFiltro" class="filtro-modal-opcoes"></div>
+        </div>
+
+        <footer class="filtro-modal-rodape">
+          <button id="cancelarModalFiltro" type="button" class="secundario">
+            Cancelar
+          </button>
+          <button id="aplicarModalFiltro" type="button" class="primario">
+            Aplicar seleção
+          </button>
+        </footer>
+      </section>
+    </div>
 
     <section id="estado" class="painel estado">Carregando dados...</section>
 
@@ -831,6 +919,9 @@
       unidade: new Set()
     };
 
+    let filtroModalAtivo = null;
+    let selecaoTemporaria = new Set();
+
     const rotulosFiltros = {
       ano: {
         singular: "ano selecionado",
@@ -939,124 +1030,89 @@
       }
 
       elemento.textContent =
-        selecionados.length +
-        " " +
-        (selecionados.length === 1 ? rotulos.singular : rotulos.plural);
+        selecionados[0] + " +" + (selecionados.length - 1);
     }
 
-    function renderizarOpcoesFiltro(id, termo = "") {
+    function tituloDoFiltro(id) {
+      const titulos = {
+        ano: "Selecionar ano",
+        mes: "Selecionar mês",
+        unidade: "Selecionar unidade"
+      };
+
+      return titulos[id] || "Selecionar filtro";
+    }
+
+    function renderizarOpcoesModal(termo = "") {
+      if (!filtroModalAtivo) return;
+
       const termoNormalizado = String(termo || "")
         .trim()
         .toLocaleLowerCase("pt-BR");
 
-      const valores = opcoesFiltros[id].filter(valor =>
+      const valores = opcoesFiltros[filtroModalAtivo].filter(valor =>
         String(valor)
           .toLocaleLowerCase("pt-BR")
           .includes(termoNormalizado)
       );
 
-      const container = $("opcoes-" + id);
+      const container = $("opcoesModalFiltro");
 
       if (!valores.length) {
         container.innerHTML =
-          '<div class="multiselect-vazio">Nenhuma opção encontrada.</div>';
+          '<div class="filtro-modal-vazio">Nenhuma opção encontrada.</div>';
         return;
       }
 
       container.innerHTML = valores.map(valor => {
-        const marcado = estadoFiltros[id].has(valor) ? "checked" : "";
+        const marcado = selecaoTemporaria.has(valor) ? "checked" : "";
 
         return `
-          <label class="multiselect-opcao">
-            <input
-              type="checkbox"
-              value="${escapar(valor)}"
-              data-filtro="${id}"
-              ${marcado}
-            >
+          <label class="filtro-modal-opcao">
+            <input type="checkbox" value="${escapar(valor)}" ${marcado}>
             <span>${escapar(valor)}</span>
           </label>
         `;
       }).join("");
     }
 
-    function fecharMultiseletores(exceto = "") {
-      ["ano", "mes", "unidade"].forEach(id => {
-        if (id === exceto) return;
+    function abrirModalFiltro(id) {
+      filtroModalAtivo = id;
+      selecaoTemporaria = new Set(estadoFiltros[id]);
 
-        const componente = $("multi-" + id);
-        const menu = $("menu-" + id);
-        const gatilho = $("gatilho-" + id);
+      $("tituloModalFiltro").textContent = tituloDoFiltro(id);
+      $("buscaModalFiltro").value = "";
+      $("buscaModalFiltro").placeholder =
+        id === "ano"
+          ? "Buscar ano..."
+          : id === "mes"
+            ? "Buscar mês..."
+            : "Buscar unidade...";
 
-        componente.classList.remove("aberto");
-        menu.hidden = true;
-        gatilho.setAttribute("aria-expanded", "false");
-      });
+      renderizarOpcoesModal();
+
+      $("modalFiltro").hidden = false;
+      document.body.style.overflow = "hidden";
+
+      setTimeout(() => $("buscaModalFiltro").focus(), 0);
     }
 
-    function configurarMultiseletor(id) {
-      const componente = $("multi-" + id);
-      if (componente.dataset.configurado === "true") return;
+    function fecharModalFiltro() {
+      $("modalFiltro").hidden = true;
+      document.body.style.overflow = "";
+      filtroModalAtivo = null;
+      selecaoTemporaria = new Set();
+    }
 
-      const gatilho = $("gatilho-" + id);
-      const menu = $("menu-" + id);
-      const busca = $("busca-" + id);
-      const opcoes = $("opcoes-" + id);
+    function configurarGatilhosDosFiltros() {
+      ["ano", "mes", "unidade"].forEach(id => {
+        const gatilho = $("gatilho-" + id);
 
-      gatilho.addEventListener("click", evento => {
-        evento.stopPropagation();
+        if (gatilho.dataset.configurado === "true") return;
 
-        const abrir = menu.hidden;
-        fecharMultiseletores(id);
-
-        menu.hidden = !abrir;
-        componente.classList.toggle("aberto", abrir);
-        gatilho.setAttribute("aria-expanded", String(abrir));
-
-        if (abrir) {
-          busca.focus();
-        }
+        gatilho.addEventListener("click", () => abrirModalFiltro(id));
+        gatilho.dataset.configurado = "true";
       });
-
-      menu.addEventListener("click", evento => {
-        evento.stopPropagation();
-      });
-
-      busca.addEventListener("input", () => {
-        renderizarOpcoesFiltro(id, busca.value);
-      });
-
-      opcoes.addEventListener("change", evento => {
-        const checkbox = evento.target.closest('input[type="checkbox"]');
-        if (!checkbox) return;
-
-        if (checkbox.checked) {
-          estadoFiltros[id].add(checkbox.value);
-        } else {
-          estadoFiltros[id].delete(checkbox.value);
-        }
-
-        atualizarResumoFiltro(id);
-        aplicarFiltros();
-      });
-
-      componente.querySelectorAll("[data-acao]").forEach(botao => {
-        botao.addEventListener("click", () => {
-          const acao = botao.dataset.acao;
-
-          if (acao === "todos") {
-            estadoFiltros[id] = new Set(opcoesFiltros[id]);
-          } else {
-            estadoFiltros[id].clear();
-          }
-
-          renderizarOpcoesFiltro(id, busca.value);
-          atualizarResumoFiltro(id);
-          aplicarFiltros();
-        });
-      });
-
-      componente.dataset.configurado = "true";
     }
 
     function preencherFiltro(id, valores) {
@@ -1068,8 +1124,7 @@
 
       opcoesFiltros[id] = valores;
 
-      configurarMultiseletor(id);
-      renderizarOpcoesFiltro(id);
+      configurarGatilhosDosFiltros();
       atualizarResumoFiltro(id);
     }
 
@@ -1567,28 +1622,64 @@
         .replaceAll("'","&#039;");
     }
 
-    document.addEventListener("click", () => {
-      fecharMultiseletores();
+    $("opcoesModalFiltro").addEventListener("change", evento => {
+      const checkbox = evento.target.closest('input[type="checkbox"]');
+      if (!checkbox) return;
+
+      if (checkbox.checked) {
+        selecaoTemporaria.add(checkbox.value);
+      } else {
+        selecaoTemporaria.delete(checkbox.value);
+      }
+    });
+
+    $("buscaModalFiltro").addEventListener("input", evento => {
+      renderizarOpcoesModal(evento.target.value);
+    });
+
+    $("selecionarTodosModal").addEventListener("click", () => {
+      if (!filtroModalAtivo) return;
+
+      selecaoTemporaria = new Set(opcoesFiltros[filtroModalAtivo]);
+      renderizarOpcoesModal($("buscaModalFiltro").value);
+    });
+
+    $("limparSelecaoModal").addEventListener("click", () => {
+      selecaoTemporaria.clear();
+      renderizarOpcoesModal($("buscaModalFiltro").value);
+    });
+
+    $("aplicarModalFiltro").addEventListener("click", () => {
+      if (!filtroModalAtivo) return;
+
+      estadoFiltros[filtroModalAtivo] = new Set(selecaoTemporaria);
+      atualizarResumoFiltro(filtroModalAtivo);
+      fecharModalFiltro();
+      aplicarFiltros();
+    });
+
+    $("cancelarModalFiltro").addEventListener("click", fecharModalFiltro);
+    $("fecharModalFiltro").addEventListener("click", fecharModalFiltro);
+
+    $("modalFiltro").addEventListener("click", evento => {
+      if (evento.target === $("modalFiltro")) {
+        fecharModalFiltro();
+      }
     });
 
     document.addEventListener("keydown", evento => {
-      if (evento.key === "Escape") {
-        fecharMultiseletores();
+      if (evento.key === "Escape" && !$("modalFiltro").hidden) {
+        fecharModalFiltro();
       }
     });
 
     function limparFiltros() {
       ["ano", "mes", "unidade"].forEach(id => {
         estadoFiltros[id].clear();
-
-        const busca = $("busca-" + id);
-        if (busca) busca.value = "";
-
-        renderizarOpcoesFiltro(id);
         atualizarResumoFiltro(id);
       });
 
-      fecharMultiseletores();
+      fecharModalFiltro();
       aplicarFiltros();
     }
 
