@@ -151,13 +151,158 @@
       backdrop-filter:blur(8px);
     }
     .filtros {
-      display:grid; grid-template-columns:repeat(3,1fr) auto; gap:14px;
-      padding:18px; align-items:end; margin-bottom:18px;
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr)) auto;
+      gap:14px;
+      padding:18px;
+      align-items:end;
+      margin-bottom:18px;
+      overflow:visible;
     }
-    label { display:block; font-size:13px; font-weight:700; margin-bottom:6px; color:#4b5563; }
-    select {
-      width:100%; min-height:44px; border:1px solid var(--borda);
-      border-radius:10px; padding:9px 12px; background:white;
+
+    label {
+      display:block;
+      margin-bottom:6px;
+      color:#4b5563;
+      font-size:13px;
+      font-weight:700;
+    }
+
+    .multiselect {
+      position:relative;
+    }
+
+    .multiselect-trigger {
+      width:100%;
+      min-height:44px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:9px 12px;
+      border:1px solid var(--borda);
+      border-radius:10px;
+      background:#ffffff;
+      color:var(--texto);
+      font:inherit;
+      text-align:left;
+      cursor:pointer;
+    }
+
+    .multiselect-trigger:hover {
+      border-color:var(--azul-recife);
+    }
+
+    .multiselect-resumo {
+      min-width:0;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      font-size:13px;
+      font-weight:700;
+    }
+
+    .multiselect-seta {
+      flex:0 0 auto;
+      color:var(--azul-recife);
+      font-size:15px;
+      transition:transform .18s ease;
+    }
+
+    .multiselect.aberto .multiselect-seta {
+      transform:rotate(180deg);
+    }
+
+    .multiselect-menu {
+      position:absolute;
+      z-index:40;
+      top:calc(100% + 7px);
+      left:0;
+      width:min(360px,92vw);
+      padding:12px;
+      border:1px solid var(--borda);
+      border-radius:12px;
+      background:#ffffff;
+      box-shadow:0 18px 40px rgba(0,43,82,.22);
+    }
+
+    .multiselect-menu[hidden] {
+      display:none;
+    }
+
+    .multiselect-busca {
+      width:100%;
+      min-height:40px;
+      margin-bottom:9px;
+      padding:8px 10px;
+      border:1px solid var(--borda);
+      border-radius:9px;
+      font:inherit;
+    }
+
+    .multiselect-acoes {
+      display:flex;
+      flex-wrap:wrap;
+      gap:7px;
+      margin-bottom:9px;
+    }
+
+    .multiselect-acao {
+      min-height:32px;
+      padding:6px 9px;
+      border:1px solid rgba(0,92,169,.22);
+      border-radius:8px;
+      background:var(--azul-recife-claro);
+      color:var(--azul-recife-escuro);
+      font-size:11px;
+      font-weight:800;
+      cursor:pointer;
+    }
+
+    .multiselect-opcoes {
+      max-height:250px;
+      overflow:auto;
+      padding-right:3px;
+    }
+
+    .multiselect-opcao {
+      display:flex;
+      align-items:flex-start;
+      gap:9px;
+      margin:0;
+      padding:8px 7px;
+      border-radius:8px;
+      color:var(--texto);
+      font-size:12px;
+      font-weight:600;
+      cursor:pointer;
+    }
+
+    .multiselect-opcao:hover {
+      background:var(--azul-recife-claro);
+    }
+
+    .multiselect-opcao input {
+      width:16px;
+      height:16px;
+      margin:0;
+      flex:0 0 16px;
+      accent-color:var(--azul-recife);
+    }
+
+    .multiselect-vazio {
+      padding:16px 8px;
+      color:var(--suave);
+      font-size:12px;
+      text-align:center;
+    }
+
+    .filtro-ajuda {
+      grid-column:1 / -1;
+      margin:-2px 0 0;
+      color:var(--suave);
+      font-size:12px;
+      line-height:1.45;
     }
     .cards { display:grid; grid-template-columns:repeat(5,1fr); gap:16px; margin-bottom:18px; }
     .card { padding:20px; border-top:4px solid var(--amarelo-recife); }
@@ -177,7 +322,7 @@
       transform:translateY(-1px);
       filter:brightness(.98);
     }
-    select:focus,button:focus,.botao:focus {
+    input:focus,.multiselect-trigger:focus,button:focus,.botao:focus {
       outline:3px solid rgba(242,230,0,.45);
       outline-offset:2px;
     }
@@ -338,6 +483,16 @@
     .card-detalhe .valor {
       font-size:30px;
     }
+    @media(max-width:900px) {
+      .filtros {
+        grid-template-columns:1fr 1fr;
+      }
+
+      .filtros > button {
+        width:100%;
+      }
+    }
+
     @media(max-width:760px) {
       .cards-detalhe { grid-template-columns:1fr; }
       .indicador-topo { flex-direction:column; }
@@ -431,18 +586,121 @@
 
     <section class="painel filtros">
       <div>
-        <label for="ano">Ano de referência</label>
-        <select id="ano"><option value="">Selecione um ano</option></select>
+        <label id="label-ano">Ano de referência</label>
+        <div id="multi-ano" class="multiselect">
+          <button
+            id="gatilho-ano"
+            type="button"
+            class="multiselect-trigger"
+            aria-expanded="false"
+            aria-controls="menu-ano"
+            aria-labelledby="label-ano resumo-ano"
+          >
+            <span id="resumo-ano" class="multiselect-resumo">Todos os anos</span>
+            <span class="multiselect-seta" aria-hidden="true">⌄</span>
+          </button>
+
+          <div id="menu-ano" class="multiselect-menu" hidden>
+            <input
+              id="busca-ano"
+              class="multiselect-busca"
+              type="search"
+              placeholder="Buscar ano..."
+              autocomplete="off"
+            >
+
+            <div class="multiselect-acoes">
+              <button type="button" class="multiselect-acao" data-acao="todos" data-filtro="ano">
+                Selecionar todos
+              </button>
+              <button type="button" class="multiselect-acao" data-acao="limpar" data-filtro="ano">
+                Limpar seleção
+              </button>
+            </div>
+
+            <div id="opcoes-ano" class="multiselect-opcoes"></div>
+          </div>
+        </div>
       </div>
       <div>
-        <label for="mes">Mês de referência</label>
-        <select id="mes"><option value="">Selecione um mês</option></select>
+        <label id="label-mes">Mês de referência</label>
+        <div id="multi-mes" class="multiselect">
+          <button
+            id="gatilho-mes"
+            type="button"
+            class="multiselect-trigger"
+            aria-expanded="false"
+            aria-controls="menu-mes"
+            aria-labelledby="label-mes resumo-mes"
+          >
+            <span id="resumo-mes" class="multiselect-resumo">Todos os meses</span>
+            <span class="multiselect-seta" aria-hidden="true">⌄</span>
+          </button>
+
+          <div id="menu-mes" class="multiselect-menu" hidden>
+            <input
+              id="busca-mes"
+              class="multiselect-busca"
+              type="search"
+              placeholder="Buscar mês..."
+              autocomplete="off"
+            >
+
+            <div class="multiselect-acoes">
+              <button type="button" class="multiselect-acao" data-acao="todos" data-filtro="mes">
+                Selecionar todos
+              </button>
+              <button type="button" class="multiselect-acao" data-acao="limpar" data-filtro="mes">
+                Limpar seleção
+              </button>
+            </div>
+
+            <div id="opcoes-mes" class="multiselect-opcoes"></div>
+          </div>
+        </div>
       </div>
       <div>
-        <label for="unidade">Unidade de saúde</label>
-        <select id="unidade"><option value="">Selecione uma unidade</option></select>
+        <label id="label-unidade">Unidade de saúde</label>
+        <div id="multi-unidade" class="multiselect">
+          <button
+            id="gatilho-unidade"
+            type="button"
+            class="multiselect-trigger"
+            aria-expanded="false"
+            aria-controls="menu-unidade"
+            aria-labelledby="label-unidade resumo-unidade"
+          >
+            <span id="resumo-unidade" class="multiselect-resumo">Todas as unidades</span>
+            <span class="multiselect-seta" aria-hidden="true">⌄</span>
+          </button>
+
+          <div id="menu-unidade" class="multiselect-menu" hidden>
+            <input
+              id="busca-unidade"
+              class="multiselect-busca"
+              type="search"
+              placeholder="Buscar unidade..."
+              autocomplete="off"
+            >
+
+            <div class="multiselect-acoes">
+              <button type="button" class="multiselect-acao" data-acao="todos" data-filtro="unidade">
+                Selecionar todos
+              </button>
+              <button type="button" class="multiselect-acao" data-acao="limpar" data-filtro="unidade">
+                Limpar seleção
+              </button>
+            </div>
+
+            <div id="opcoes-unidade" class="multiselect-opcoes"></div>
+          </div>
+        </div>
       </div>
       <button id="limpar" type="button" class="secundario">Limpar filtros</button>
+
+      <p class="filtro-ajuda">
+        Selecione uma ou várias opções. Sem seleção, o dashboard considera todos os valores disponíveis.
+      </p>
     </section>
 
     <section id="estado" class="painel estado">Carregando dados...</section>
@@ -560,7 +818,36 @@
     let filtrados = [];
     let chartUnidades;
     let chartMeses;
-    let chartTreinados;
+
+    const opcoesFiltros = {
+      ano: [],
+      mes: [],
+      unidade: []
+    };
+
+    const estadoFiltros = {
+      ano: new Set(),
+      mes: new Set(),
+      unidade: new Set()
+    };
+
+    const rotulosFiltros = {
+      ano: {
+        singular: "ano selecionado",
+        plural: "anos selecionados",
+        todos: "Todos os anos"
+      },
+      mes: {
+        singular: "mês selecionado",
+        plural: "meses selecionados",
+        todos: "Todos os meses"
+      },
+      unidade: {
+        singular: "unidade selecionada",
+        plural: "unidades selecionadas",
+        todos: "Todas as unidades"
+      }
+    };
 
     const $ = id => document.getElementById(id);
     const numero = valor => new Intl.NumberFormat("pt-BR",{maximumFractionDigits:0}).format(Number(valor)||0);
@@ -635,34 +922,177 @@
       }
     }
 
-    function preencherSelect(id, valores, textoInicial) {
-      const select = $(id);
-      const valorAtual = select.value;
+    function atualizarResumoFiltro(id) {
+      const selecionados = [...estadoFiltros[id]];
+      const totalOpcoes = opcoesFiltros[id].length;
+      const elemento = $("resumo-" + id);
+      const rotulos = rotulosFiltros[id];
 
-      select.innerHTML =
-        `<option value="">${textoInicial}</option>` +
-        valores
-          .map(valor =>
-            `<option value="${escapar(valor)}">${escapar(valor)}</option>`
-          )
-          .join("");
+      if (!selecionados.length || selecionados.length === totalOpcoes) {
+        elemento.textContent = rotulos.todos;
+        return;
+      }
 
-      select.value = valores.includes(valorAtual) ? valorAtual : "";
+      if (selecionados.length === 1) {
+        elemento.textContent = selecionados[0];
+        return;
+      }
+
+      elemento.textContent =
+        selecionados.length +
+        " " +
+        (selecionados.length === 1 ? rotulos.singular : rotulos.plural);
+    }
+
+    function renderizarOpcoesFiltro(id, termo = "") {
+      const termoNormalizado = String(termo || "")
+        .trim()
+        .toLocaleLowerCase("pt-BR");
+
+      const valores = opcoesFiltros[id].filter(valor =>
+        String(valor)
+          .toLocaleLowerCase("pt-BR")
+          .includes(termoNormalizado)
+      );
+
+      const container = $("opcoes-" + id);
+
+      if (!valores.length) {
+        container.innerHTML =
+          '<div class="multiselect-vazio">Nenhuma opção encontrada.</div>';
+        return;
+      }
+
+      container.innerHTML = valores.map(valor => {
+        const marcado = estadoFiltros[id].has(valor) ? "checked" : "";
+
+        return `
+          <label class="multiselect-opcao">
+            <input
+              type="checkbox"
+              value="${escapar(valor)}"
+              data-filtro="${id}"
+              ${marcado}
+            >
+            <span>${escapar(valor)}</span>
+          </label>
+        `;
+      }).join("");
+    }
+
+    function fecharMultiseletores(exceto = "") {
+      ["ano", "mes", "unidade"].forEach(id => {
+        if (id === exceto) return;
+
+        const componente = $("multi-" + id);
+        const menu = $("menu-" + id);
+        const gatilho = $("gatilho-" + id);
+
+        componente.classList.remove("aberto");
+        menu.hidden = true;
+        gatilho.setAttribute("aria-expanded", "false");
+      });
+    }
+
+    function configurarMultiseletor(id) {
+      const componente = $("multi-" + id);
+      if (componente.dataset.configurado === "true") return;
+
+      const gatilho = $("gatilho-" + id);
+      const menu = $("menu-" + id);
+      const busca = $("busca-" + id);
+      const opcoes = $("opcoes-" + id);
+
+      gatilho.addEventListener("click", evento => {
+        evento.stopPropagation();
+
+        const abrir = menu.hidden;
+        fecharMultiseletores(id);
+
+        menu.hidden = !abrir;
+        componente.classList.toggle("aberto", abrir);
+        gatilho.setAttribute("aria-expanded", String(abrir));
+
+        if (abrir) {
+          busca.focus();
+        }
+      });
+
+      menu.addEventListener("click", evento => {
+        evento.stopPropagation();
+      });
+
+      busca.addEventListener("input", () => {
+        renderizarOpcoesFiltro(id, busca.value);
+      });
+
+      opcoes.addEventListener("change", evento => {
+        const checkbox = evento.target.closest('input[type="checkbox"]');
+        if (!checkbox) return;
+
+        if (checkbox.checked) {
+          estadoFiltros[id].add(checkbox.value);
+        } else {
+          estadoFiltros[id].delete(checkbox.value);
+        }
+
+        atualizarResumoFiltro(id);
+        aplicarFiltros();
+      });
+
+      componente.querySelectorAll("[data-acao]").forEach(botao => {
+        botao.addEventListener("click", () => {
+          const acao = botao.dataset.acao;
+
+          if (acao === "todos") {
+            estadoFiltros[id] = new Set(opcoesFiltros[id]);
+          } else {
+            estadoFiltros[id].clear();
+          }
+
+          renderizarOpcoesFiltro(id, busca.value);
+          atualizarResumoFiltro(id);
+          aplicarFiltros();
+        });
+      });
+
+      componente.dataset.configurado = "true";
+    }
+
+    function preencherFiltro(id, valores) {
+      const valoresValidos = new Set(valores);
+
+      estadoFiltros[id] = new Set(
+        [...estadoFiltros[id]].filter(valor => valoresValidos.has(valor))
+      );
+
+      opcoesFiltros[id] = valores;
+
+      configurarMultiseletor(id);
+      renderizarOpcoesFiltro(id);
+      atualizarResumoFiltro(id);
     }
 
     function preencherFiltros() {
-      const anos = [...new Set(base.map(d=>d.anoReferencia).filter(Boolean))].sort((a,b)=>Number(a)-Number(b));
-      const meses = [...new Set(base.map(d=>d.mesReferencia).filter(Boolean))].sort(ordenarMeses);
-      const unidades = [...new Set(base.map(d=>d.unidade).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"pt-BR"));
+      const anos = [...new Set(
+        base.map(dado => dado.anoReferencia).filter(Boolean)
+      )].sort((a, b) => Number(a) - Number(b));
 
-      preencherSelect("ano", anos, "Selecione um ano");
-      preencherSelect("mes", meses, "Selecione um mês");
-      preencherSelect("unidade", unidades, "Selecione uma unidade");
+      const meses = [...new Set(
+        base.map(dado => dado.mesReferencia).filter(Boolean)
+      )].sort(ordenarMeses);
+
+      const unidades = [...new Set(
+        base.map(dado => dado.unidade).filter(Boolean)
+      )].sort((a, b) => a.localeCompare(b, "pt-BR"));
+
+      preencherFiltro("ano", anos);
+      preencherFiltro("mes", meses);
+      preencherFiltro("unidade", unidades);
     }
 
     function valoresSelecionados(id) {
-      const valor = $(id).value;
-      return valor ? [valor] : [];
+      return [...estadoFiltros[id]];
     }
 
     function filtrosSelecionados() {
@@ -781,19 +1211,17 @@
 
     function calcularResumo(dados) {
       /*
-       * Índice de Atividade da Educação Permanente — período de 6 meses:
+       * Índice de Atividade da Educação Permanente:
        *
-       * 1. Soma os profissionais ativos dos seis meses.
-       * 2. Divide a soma dos ativos por 6 para obter a média mensal de ativos.
-       * 3. Soma os profissionais treinados dos seis meses.
-       * 4. Divide a soma dos treinados por 6 para obter a média mensal de treinados.
-       * 5. Índice = média mensal de treinados / média mensal de ativos × 100.
+       * 1. Consolida os profissionais ativos e treinados por unidade e Ano-Mês.
+       * 2. Soma os valores dos períodos presentes no recorte.
+       * 3. Divide cada soma pela quantidade de períodos Ano-Mês considerados.
+       * 4. Índice = média mensal de treinados / média mensal de ativos × 100.
        *
        * Para evitar duplicar o quadro ativo quando uma unidade possui mais de
        * um registro no mesmo mês, primeiro é calculada a média dos ativos por
        * unidade e período.
        */
-      const QUANTIDADE_MESES_INDICE = 6;
       const unidadePeriodo = new Map();
 
       dados.forEach(dado => {
@@ -855,11 +1283,13 @@
         0
       );
 
+      const quantidadePeriodosIndice = Math.max(periodos.size, 1);
+
       const mediaMensalAtivos =
-        somaAtivos / QUANTIDADE_MESES_INDICE;
+        somaAtivos / quantidadePeriodosIndice;
 
       const mediaMensalTreinados =
-        somaTreinados / QUANTIDADE_MESES_INDICE;
+        somaTreinados / quantidadePeriodosIndice;
 
       const indiceGeral = mediaMensalAtivos
         ? mediaMensalTreinados / mediaMensalAtivos
@@ -871,7 +1301,7 @@
         totalTreinados: somaTreinados,
         somaAtivosPeriodos: somaAtivos,
         indiceGeral,
-        quantidadeMesesIndice: QUANTIDADE_MESES_INDICE,
+        quantidadeMesesIndice: quantidadePeriodosIndice,
         quantidadePeriodosEncontrados: periodos.size,
         quantidadeUnidades: new Set(
           dados.map(dado => dado.unidade).filter(Boolean)
@@ -1137,13 +1567,28 @@
         .replaceAll("'","&#039;");
     }
 
-    ["ano","mes","unidade"].forEach(id=>$(id).addEventListener("change",aplicarFiltros));
-    function limparFiltros() {
-      $("ano").value = "";
-      $("mes").value = "";
-      $("unidade").value = "";
+    document.addEventListener("click", () => {
+      fecharMultiseletores();
+    });
 
-      // Sem filtros selecionados, o dashboard reapresenta a visão geral.
+    document.addEventListener("keydown", evento => {
+      if (evento.key === "Escape") {
+        fecharMultiseletores();
+      }
+    });
+
+    function limparFiltros() {
+      ["ano", "mes", "unidade"].forEach(id => {
+        estadoFiltros[id].clear();
+
+        const busca = $("busca-" + id);
+        if (busca) busca.value = "";
+
+        renderizarOpcoesFiltro(id);
+        atualizarResumoFiltro(id);
+      });
+
+      fecharMultiseletores();
       aplicarFiltros();
     }
 
@@ -1151,8 +1596,9 @@
       evento.preventDefault();
       limparFiltros();
     });
+
     $("atualizar").addEventListener("click", carregar);
-    $("exportar").addEventListener("click",exportarCsv);
+    $("exportar").addEventListener("click", exportarCsv);
 
     carregar();
   </script>
