@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard - Educação Permanente</title>
+  <title>Dashboard - Educação Permanente - SERMAC</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
   <style>
     :root {
@@ -667,13 +667,13 @@
             alt="Recife Cuida Mais, SUS, Secretaria de Saúde e Prefeitura do Recife"
           >
         </div>
-        <div class="nome-sistema">Educação Permanente em Saúde</div>
+        <div class="nome-sistema">Núcleo de Educação Permanente em Saúde - SERMAC</div>
       </div>
 
       <div class="topo">
         <div class="cabecalho-texto">
           <span class="cabecalho-selo">Secretaria de Saúde do Recife</span>
-          <h1>Dashboard de Educação Permanente</h1>
+          <h1>Dashboard de Educação Permanente - SERMAC</h1>
           <p>Monitoramento das ações de capacitação por ano, mês e unidade.</p>
         </div>
 
@@ -953,10 +953,31 @@
     }
 
     function padronizarNomeUnidade(valor) {
-      return String(valor || "")
+      const nomeOriginal = String(valor || "")
         .replace(/\bValdemar\b/gi, "Waldemar")
         .replace(/\s+/g, " ")
         .trim();
+
+      const chave = nomeOriginal
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLocaleLowerCase("pt-BR");
+
+      const aliases = {
+        "laboratorio municipal de saude publica":
+          "Laboratório Municipal de Saúde Pública",
+
+        "servico de atendimento movel de urgencia":
+          "Serviço de Atendimento Móvel de Urgência",
+
+        "samu":
+          "Serviço de Atendimento Móvel de Urgência",
+
+        "servico de atendimento movel de urgencia - samu":
+          "Serviço de Atendimento Móvel de Urgência"
+      };
+
+      return aliases[chave] || nomeOriginal;
     }
 
     function ordenarMeses(a,b) {
